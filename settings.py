@@ -1,0 +1,82 @@
+import pygame
+
+class Settings:
+    def __init__(self):
+        '''handles the variables to alter/change the behavior of the game'''
+        # Screen
+        self.frame = 60
+        self.screen_bottom_color = (30, 34, 42) # Background bottom color 
+        self.screen_top_color = (40, 44, 54) # Background top color
+        self.panel_width_ratio = 0.4
+        self.panel_color = (52, 58, 68)
+        self.panel_border_color = (95, 194, 232)
+
+        # Ball
+        self.ball_color = (0, 0, 0)
+        self.ball_radius = 60 
+        self.added_ball = 5 # Added ball per round
+        self.ball_diff_factor = None
+        self.a_y = 0.1 # The change in ball's velocity with time in y axis
+        self.a_x = 0.3 # The chnage in ball's velocity with time in x axis
+        self.ball_delay_ms = 3000 # 3ms
+
+        # Bar
+        self.bar_color = (230, 90, 70)
+        self.bar_start_speed = 0.5
+        # Bar speed Factors
+        
+        self.incorrect_answer_factor = 1.15 # THis was gotten using the square root of the (bar speed of round + 1/ bar speed of ROund)
+        # this is to ensure that after 5 loss (Failure to provide answer during the given time), the bar speed is just about the
+        # bar speed of the next level
+
+        # Spike
+        self.spike_color = (45, 180, 165)
+        self.spike_num = 15
+        self.spike_height = 60
+        self.spike_speed = 1
+        self.smoothness_factor = 1 # To ensure smooth chain of spike movvement, filling up the gap created
+        # by the removal of a spike instance.
+        self.intitalize_dynamic_settings()
+
+        # Text
+        self.text_color = (230, 230, 235)
+        self.text_font = pygame.font.SysFont(None, 48)
+        self.bar_txt_font = pygame.font.SysFont(None, 34)
+        self.panel_head_font = pygame.font.SysFont('arial', 60, bold= True, italic= True)
+        self.panel_sub_font = pygame.font.SysFont('arial', 35)
+        self.panel_label_font = pygame.font.SysFont('arial', 50)
+        self.panel_intrct_font = pygame.font.SysFont('arial', 28)
+        self.panel_head_color = (255, 255, 255)
+        self.panel_sub_color = (155, 170, 185)
+        self.txt_delay_ms = 5000 # 5ms
+
+        # Game Over font setting
+        self.game_over_main = pygame.font.SysFont('arial', 90, bold= True, italic= True)
+        self.game_over_sub = pygame.font.SysFont('arial', 50, bold= True)
+        self.game_over_label = pygame.font.SysFont('arial', 50)
+        self.g_o_txt_color = (0, 0, 0)
+        self.g_o_button_color = (230, 230, 235)
+        self.game_over_font = {'main': self.game_over_main, 'sub': self.game_over_sub, 'label': self.game_over_label}
+        self.game_over_txt_color = {'main': self.text_color, 'sub' : self.text_color, 'label': self.g_o_txt_color}
+        self.game_over_bckg_color = {'main': self.panel_border_color, 'sub': self.panel_border_color, 'label': self.g_o_button_color}
+        self.g_o_txt_color = (0, 0, 0)
+        
+        # Font Panel Settings (Subset of Text)
+        self.font_size = {'head' : self.panel_head_font, 'sub' : self.panel_sub_font, 'label': self.panel_label_font, 'intrct': self.panel_intrct_font}
+        self.font_color = {'head' : self.panel_head_color, 'sub' : self.panel_sub_color, 'label': self.panel_border_color, 'intrct': self.panel_head_color}
+        self.font_bckg_color = {'head' : self.panel_color, 'sub' : self.panel_color, 'label': self.panel_border_color, 'intrct': self.panel_head_color}
+
+        # Button (Subset of Text)
+        self.button_padding = 50
+
+        # Question (Subset of Text)
+        self.qn_distance = 100 # Distance of the question from the bottom of the screen
+        self.stealth_factor = 50 # this factor hides the message or equation once created before update method is called
+        # to bring it visibly on the screen
+        
+        # Answer (Subset of Text)
+        self.answer_x_offset = 30   # how far along the line the typed answer starts
+        self.answer_y_offset = 2     # nudge so the answer sits ON the line, not above it
+
+    def intitalize_dynamic_settings(self):
+        self.ball_count = 5 # The amount of balls in a round
