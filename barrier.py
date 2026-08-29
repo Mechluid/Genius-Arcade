@@ -2,6 +2,7 @@ import pygame
 from pygame.sprite import Sprite
 
 class Barrier(Sprite):
+    '''Handles the bar properties acting as a barrier to the balls in motion'''
     def __init__(self, game_instance):
         super().__init__()
         self.screen = game_instance.screen
@@ -18,10 +19,12 @@ class Barrier(Sprite):
         self.rect.y = self.y
 
     def reset(self):
+        '''It resets the bar to its intial position'''
         self.rect.y = self.bar_y
         self.y = float(self.rect.y)
 
     def __repr__(self):
+        '''for easy debug of the ball's motion'''
         return (f'Bar_Distance: {self.rect.y}')
     
     def draw(self):

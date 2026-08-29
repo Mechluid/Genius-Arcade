@@ -1,6 +1,7 @@
 import pygame
 
 class GameOver:
+    '''Handles the on-screen texts and icons when the game played is over'''
     def __init__(self, game_instance, message, offset_y, text_type, offset_x= None):
         self.screen = game_instance.screen
         self.settings = game_instance.settings
@@ -11,6 +12,7 @@ class GameOver:
         self.prep_game_over_txt()
 
     def prep_game_over_txt(self):
+        '''Responsible for rendering the text and its properties on the screen'''
         self.font = self.settings.game_over_font[self.text_type]
         self.txt_color = self.settings.game_over_txt_color[self.text_type]
         self.bckg_color = self.settings.game_over_bckg_color[self.text_type]
@@ -24,9 +26,9 @@ class GameOver:
         self.rect.centery = self.screen.get_rect().height * self.offset_y
 
     def update(self, offset):
+        '''Handles the text-on-entering motion'''
         if self.rect.centerx > offset * self.screen.get_rect().width:
             self.rect.x -= 10
-
 
     def button(self):
         self.button_width, self.button_height = ((self.rect.width + self.settings.button_padding), 
@@ -36,9 +38,11 @@ class GameOver:
         self.corner_radius = self.button_height // 2
 
     def show_text(self):
+        '''Shows text on screen'''
         self.screen.blit(self.image, self.rect)
 
     def draw_button(self):
+        '''Draws the button the screen'''
         pygame.draw.rect(self.screen, self.bckg_color, self.button_rect, border_radius=self.corner_radius)
         
     

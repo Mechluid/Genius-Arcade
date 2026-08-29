@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 
 from settings import Settings
 from ball import Ball
@@ -15,28 +14,23 @@ from heart import Heart
 from game_over import GameOver
 
 class GeniusArcade:
+    '''
+    Overall class to manage game assets, behavior, and the main run loop.
+    This class serves as the central engine for the game. It is responsible 
+    for initializing Pygame, configuring the display window, tracking game states, 
+    and orchestrating all interactive elements including balls, spikes, UI panels, 
+    and player statistics.
+    '''
     def __init__(self):
         '''Initialize the game'''
         pygame.init()
-        self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
-        self.screen_width, self.screen_height = self.screen.get_rect().size
-        self.top_bar_rect = pygame.Rect(0, 0, self.screen_width, 80)
-        self.clock = pygame.time.Clock()
+        self.initialize_window_properties()
         self.settings = Settings()
-        self.launched_game = False
-        self.start_game = False
-        self.end_game = False
+        self.important_game_flags()
         self.stats = GameStats(self)
         self.create_panel_attribute()
-        self.bars = pygame.sprite.Group()
-        self.balls = pygame.sprite.Group()
-        self.last_update_time = pygame.time.get_ticks()
-        self.qn_update_time = pygame.time.get_ticks()
-        self.game_update_time = pygame.time.get_ticks()
-        self.spikes = pygame.sprite.Group()
-        self.strd_qn = pygame.sprite.Group()
-        self.input_elements = pygame.sprite.Group()
-        self.hearts = pygame.sprite.Group()
+        self.game_entities()
+        self.game_time_props()
         self.add_up_balls()
         self.create_spikes()
         self.setup_menu_bar_text()
@@ -46,6 +40,30 @@ class GeniusArcade:
         self.create_game_over_panel()
         self.create_game_over_txt()
         self.display_game_over_exits()
+
+    def initialize_window_properties(self):
+        self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
+        self.screen_width, self.screen_height = self.screen.get_rect().size
+        self.top_bar_rect = pygame.Rect(0, 0, self.screen_width, 80)
+        self.clock = pygame.time.Clock()
+
+    def important_game_flags(self):
+        self.launched_game = False
+        self.start_game = False
+        self.end_game = False
+
+    def game_entities(self):
+        self.bars = pygame.sprite.Group()
+        self.balls = pygame.sprite.Group()
+        self.spikes = pygame.sprite.Group()
+        self.strd_qn = pygame.sprite.Group()
+        self.input_elements = pygame.sprite.Group()
+        self.hearts = pygame.sprite.Group()
+
+    def game_time_props(self):
+        self.last_update_time = pygame.time.get_ticks()
+        self.qn_update_time = pygame.time.get_ticks()
+        self.game_update_time = pygame.time.get_ticks()
 
     def create_panel_attribute(self):
         self.panel_w = self.screen_width * self.settings.panel_width_ratio 

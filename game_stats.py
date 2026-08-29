@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 
 class GameStats:
+    '''Manages the gameplay variables'''
     def __init__(self, game_instance):
         self.settings = game_instance.settings
         self.path = Path(__file__).parent / 'high_score.txt'

@@ -5,9 +5,9 @@ import math
 from pathlib import Path
 
 class Ball(Sprite):
+    """Initailize the ball's property and handles the motion"""
     def __init__(self, game_instance):
         super().__init__()
-        '''Initailize the ball's property'''
         self.screen = game_instance.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game_instance.settings
@@ -17,8 +17,8 @@ class Ball(Sprite):
         # Ball postioning and precise motioning
         self.rect.x = (self.rect.width / 2)
         self.rect.y = self.top_frame.bottom
-        self.x = float(self.rect.x)
-        self.y = float(self.rect.y)
+        self.x = float(self.rect.x) # For precise postioning of the ball when influenced by a given parameter
+        self.y = float(self.rect.y) 
         self.ball_initial_parameters()
         # Impulse
         # This ensures the ball covers the maximum/required distance to another frame when it bounces off a frame
@@ -37,30 +37,30 @@ class Ball(Sprite):
         '''Used to get the ball image to be displayed on the screen'''
         image_path = Path(__file__).parent/ 'ball.bmp'
         self.ball_image = pygame.image.load(image_path)
-        self.ball_diameter = 2 * self.settings.ball_radius
+        self.ball_diameter = 2 * self.settings.ball_radius # modifying the ball shape to better suit the game aesthetics
         self.scaled_ball_size = (self.ball_diameter, self.settings.ball_radius)
         self.ball_scaled_image = pygame.transform.smoothscale(self.ball_image, self.scaled_ball_size)
         self.rect = self.ball_scaled_image.get_rect()
 
     def update(self):
-        '''Update in the ball's position when the loop runs'''
-        self.bounced_this_frame = False
+        '''Update in the ball's position when the game loop runs'''
+        self.bounced_this_frame = False # TO avoid a glitch where the ball bounces in two different sides in one frame
         self._ball_vertical_movement()
         self._ball_horizontal_movement()
 
     def _ball_vertical_movement(self):
         '''Handles the vertical movement of the ball'''
         if self.launched:
-            self.y += self.dy
-            self.dy += self.settings.a_y
-            self.rect.y = self.y 
+            self.y += self.dy # Constant vertical velocity unless acted upon by an external force 
+            self.dy += self.settings.a_y # this depicts the influence of gravity when the ball is in motion.
+            self.rect.y = self.y # keeps the ball image postioning in sync with the influenced ball variable.
             self.check_top_bottom_edges()
 
     def _ball_horizontal_movement(self):
         '''Handles the horizontal movement of the ball'''
         self.x += self.dx
         if not self.launched:
-            self.dx += self.settings.a_x
+            self.dx += self.settings.a_x # Handles the burst accerelation of the ball at the entry
         self.rect.x = self.x
         self.check_right_left_edges()
 
@@ -68,12 +68,13 @@ class Ball(Sprite):
         '''Check top and bottom edges, reverse dy and help avoid getting stucked.'''
         for bar in self.bars:
             if self.rect.bottom >= bar.rect.top:
-                # Snap to the bar's top edge so it doesn't get stuck
+                # Snap to the bar's top edge so it doesn't get stuck to the frame edge
                 self.rect.bottom = bar.rect.top
                 self.y = float(self.rect.y)
                 if not self.bounced_this_frame:
-                    self.bounced_this_frame = True 
-                    self.dx = self.impulse_x if random.random() > 0.5 else -self.impulse_x # introduces randomness
+                    self.bounced_this_frame = True # This flag is to ensure the ball has no duplicate 
+                    # bouncing off a edge motion in one frame, once true, it doesn't run for the remaining.
+                    self.dx = self.impulse_x if random.random() > 0.5 else -self.impulse_x # introduces randomness in the ball's motion
                     self.dy = -self.impulse_y
 
         if self.rect.top <= self.top_frame.bottom:
@@ -110,8 +111,9 @@ class Ball(Sprite):
                 self.dx = self.impulse_x
     
     def __repr__(self):
+        '''for easy debug of the ball's motion'''
         return (f' Ball: x = {self.rect.x }, y = {self.rect.y}')
 
     def draw(self):
-        '''To draw the ball on the screen'''
+        '''To draw the ball on the shared screen'''
         self.screen.blit(self.ball_scaled_image, self.rect)
