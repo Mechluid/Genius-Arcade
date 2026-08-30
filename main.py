@@ -1,6 +1,5 @@
 import pygame
 import sys
-import random
 
 from settings import Settings
 from ball import Ball
@@ -15,28 +14,23 @@ from heart import Heart
 from game_over import GameOver
 
 class GeniusArcade:
+    '''
+    Overall class to manage game assets, behavior, and the main run loop.
+    This class serves as the central engine for the game. It is responsible 
+    for initializing Pygame, configuring the display window, tracking game states, 
+    and orchestrating all interactive elements including balls, spikes, UI panels, 
+    and player statistics.
+    '''
     def __init__(self):
         '''Initialize the game'''
         pygame.init()
-        self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
-        self.screen_width, self.screen_height = self.screen.get_rect().size
-        self.top_bar_rect = pygame.Rect(0, 0, self.screen_width, 80)
-        self.clock = pygame.time.Clock()
+        self.initialize_window_properties()
         self.settings = Settings()
-        self.launched_game = False
-        self.start_game = False
-        self.end_game = False
+        self.important_game_flags()
         self.stats = GameStats(self)
         self.create_panel_attribute()
-        self.bars = pygame.sprite.Group()
-        self.balls = pygame.sprite.Group()
-        self.last_update_time = pygame.time.get_ticks()
-        self.qn_update_time = pygame.time.get_ticks()
-        self.game_update_time = pygame.time.get_ticks()
-        self.spikes = pygame.sprite.Group()
-        self.strd_qn = pygame.sprite.Group()
-        self.input_elements = pygame.sprite.Group()
-        self.hearts = pygame.sprite.Group()
+        self.game_entities()
+        self.game_time_props()
         self.add_up_balls()
         self.create_spikes()
         self.setup_menu_bar_text()
@@ -46,6 +40,30 @@ class GeniusArcade:
         self.create_game_over_panel()
         self.create_game_over_txt()
         self.display_game_over_exits()
+
+    def initialize_window_properties(self):
+        self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
+        self.screen_width, self.screen_height = self.screen.get_rect().size
+        self.top_bar_rect = pygame.Rect(0, 0, self.screen_width, 80)
+        self.clock = pygame.time.Clock()
+
+    def important_game_flags(self):
+        self.launched_game = False
+        self.start_game = False
+        self.end_game = False
+
+    def game_entities(self):
+        self.bars = pygame.sprite.Group()
+        self.balls = pygame.sprite.Group()
+        self.spikes = pygame.sprite.Group()
+        self.strd_qn = pygame.sprite.Group()
+        self.input_elements = pygame.sprite.Group()
+        self.hearts = pygame.sprite.Group()
+
+    def game_time_props(self):
+        self.last_update_time = pygame.time.get_ticks()
+        self.qn_update_time = pygame.time.get_ticks()
+        self.game_update_time = pygame.time.get_ticks()
 
     def create_panel_attribute(self):
         self.panel_w = self.screen_width * self.settings.panel_width_ratio 
@@ -59,8 +77,6 @@ class GeniusArcade:
         self.g_o_panel_height = self.panel_h * 0.5
         self.g_o_panel = pygame.Rect(0, 0, self.g_o_panel_width, self.g_o_panel_height)
         self.g_o_panel.center = self.screen.get_rect().center
-# Customize the panel with Score: The score player got, Then high score:, then will csutomize stuff like
-# if the score> high score , New HIgh score reached!, else: Try Better next time
 
     def create_hearts(self):
         for index in range(self.stats.heart_num):
@@ -73,8 +89,8 @@ class GeniusArcade:
         self.select_diff = MenuBar(self, f'Difficulty: {display}', 0.025)
         self.how_to_play = MenuBar(self, 'How to Play?', 0.167)
         self.score = MenuBar(self, f'Score: {display}', 0.309)
-        self.high_score = MenuBar(self, 'High Score:', 0.451)
-        self.round = MenuBar(self, f'round: {display}', 0.593)
+        self.high_score = MenuBar(self, f'High Score: {display}', 0.451)
+        self.game_round = MenuBar(self, f'round: {display}', 0.593)
         self.remaining_balls = MenuBar(self, f'Balls: {display}', 0.735)
         self.heart_level = MenuBar(self, f'hearts:', 0.875)
 
@@ -211,8 +227,17 @@ class GeniusArcade:
         if main_menu_bttn_clicked and self.end_game:
             self.launched_game = False
             self.end_game = False
-            self.setup_menu_bar_text() # i know might be inefficient due to creating another more instances again,
-            # except i put them all in s sprite group and emoty then create new one, could be the same tho
+            self.reset_menu_displays()
+
+    def reset_menu_displays(self):
+        '''Resets the existing menu UI text back to their default states'''
+        display = '--:--'
+        self.select_diff.update(f'Difficulty: {display}')
+        self.score.update(f'Score: {display}')
+        self.high_score.update(f'High Score: {display}')
+        self.game_round.update(f'round: {display}')
+        self.remaining_balls.update(f'balls: {display}')
+        self.heart_level.update(f'hearts:')
 
     def update_ball_onscreen(self):
         msg = f'Balls: {len(self.balls)}'
@@ -232,7 +257,7 @@ class GeniusArcade:
     def setting_game_stats(self):
         display = 0
         self.score.update(f'Score: {display}')
-        self.round.update(f'round: {self.stats.round}')
+        self.game_round.update(f'round: {self.stats.game_round}')
         self.high_score.update(f'high score: {self.stats.high_score}')
 
     def timing_balls(self):
@@ -250,7 +275,7 @@ class GeniusArcade:
             '''This starts the game (Spawning of the questions the user has to answer)'''
             if len(self.balls) >= self.settings.ball_count and not self.start_game:
                 self.start_game = True
-                self.current_bar_speed = self.settings.bar_start_speed * self.stats.round
+                self.current_bar_speed = self.settings.bar_start_speed * self.stats.game_round
                 self.previous_best = self.stats.high_score
                 self.qn_update_time = self.current_time
 
@@ -366,15 +391,15 @@ class GeniusArcade:
 
     def finish_game_round(self):
         if not self.balls:
-            self.stats.round += 1
+            self.stats.game_round += 1
             self.reset_game_entities()
             self.get_ball_count()
-            self.round.update(f'round: {self.stats.round}')
+            self.game_round.update(f'round: {self.stats.game_round}')
             self.update_ball_elements()
 
     def get_ball_count(self):
         '''To get ball count for a particular round'''
-        previous_round = self.stats.round - 1
+        previous_round = self.stats.game_round - 1
         self.settings.ball_count += (previous_round * self.settings.added_ball)
 
     def reset_game_entities(self):
@@ -392,24 +417,24 @@ class GeniusArcade:
         self.how_to_play.show_text()
         self.score.show_text()
         self.high_score.show_text()
-        self.round.show_text()
+        self.game_round.show_text()
         self.heart_level.show_text()
         self.remaining_balls.show_text()
 
     def screen_update(self):
-        '''Updates screeen chnages after each loop'''
+        '''Updates screeen changes after each loop'''
         self.background_color_fill()
         if not self.end_game:
             if self.launched_game:
                 for ball in self.balls:
                     ball.draw()
+                for bar in self.bars:
+                    bar.draw()
                 if self.bars:
                     for qn in self.strd_qn:
                         qn.show()
                     for element in self.input_elements:
                         element.show()
-                for bar in self.bars:
-                    bar.draw()
                 for spike in self.spikes:
                     spike.draw()
                 for index, heart in enumerate(sorted(self.hearts, key=lambda h: h.rect.x)):

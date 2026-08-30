@@ -3,6 +3,7 @@ from pygame.sprite import Sprite
 from pathlib import Path
 
 class Heart(Sprite):
+    '''Manages the heart icon depicting player's chances'''
     def __init__(self, game_instance):
         super().__init__()
         self.screen = game_instance.screen

@@ -1,6 +1,7 @@
 import pygame 
 
 class MenuPanel():
+    '''Responsible for the game's menu panel texts and icons'''
     def __init__(self, game_instance, messsage, offset_y, font, color = None, bck_color = None): # type of text on panel
         self.screen = game_instance.screen
         self.settings = game_instance.settings
@@ -8,6 +9,7 @@ class MenuPanel():
         self.prep_menu_panel_txt(messsage, offset_y, font, color, bck_color)
 
     def check_text_type(self, font, color, bck_color):
+        '''To classify the type of text and its properties to be displayed once game over'''
         if color == None:
             color = font
         if bck_color == None:

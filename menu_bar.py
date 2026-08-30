@@ -1,6 +1,7 @@
 import pygame
 
 class MenuBar:
+    '''Handles the icons and texts displayed on the game's menu bar'''
     def __init__(self, game_instance, message, offset_x):
         self.screen = game_instance.screen
         self.settings = game_instance.settings
@@ -25,6 +26,7 @@ class MenuBar:
         self.corner_radius = self.button_height // 2
 
     def update(self, message):
+        '''Handles the changes occuring on the menu bar'''
         self.message = message
         self.prep_menu_bar_text()
         self.button()

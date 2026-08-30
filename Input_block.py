@@ -1,7 +1,7 @@
-import pygame
 from pygame.sprite import Sprite
 
 class InputBox(Sprite):
+    '''Responsible for the user input texts'''
     def __init__(self, input, question, game_instance):
         super().__init__()
         self.screen = game_instance.screen

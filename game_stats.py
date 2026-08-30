@@ -2,6 +2,7 @@ from pathlib import Path
 import json
 
 class GameStats:
+    '''Manages the gameplay variables'''
     def __init__(self, game_instance):
         self.settings = game_instance.settings
         self.path = Path(__file__).parent / 'high_score.txt'
@@ -12,7 +13,7 @@ class GameStats:
         self.reset_stats()
 
     def reset_stats(self):
-        self.round = 1
+        self.game_round = 1
         self.score = 0
         self.heart_num = 3
 
