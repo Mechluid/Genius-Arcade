@@ -1,6 +1,7 @@
 import pygame
 
 class Settings:
+    '''Stores the game settings'''
     def __init__(self):
         '''handles the variables to alter/change the behavior of the game'''
         # Screen

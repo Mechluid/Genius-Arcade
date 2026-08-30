@@ -24,7 +24,7 @@ class Barrier(Sprite):
         self.y = float(self.rect.y)
 
     def __repr__(self):
-        '''for easy debug of the ball's motion'''
+        '''for easy debug of the bars's motion'''
         return (f'Bar_Distance: {self.rect.y}')
     
     def draw(self):

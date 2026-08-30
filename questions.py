@@ -4,6 +4,9 @@ from pygame.sprite import Sprite
 from math import prod
 
 class Question(Sprite):
+    '''
+    Setups the question bank by working with a sample size, to be decided by the game and performing series of randomized operations.
+    '''
     def __init__(self, game_instance, min_number, max_number):
         super().__init__()
         self.screen = game_instance.screen
