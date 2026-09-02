@@ -63,7 +63,6 @@ class Settings:
         # Font Panel Settings (Subset of Text)
         self.font_size = {'head' : self.panel_head_font, 'sub' : self.panel_sub_font, 'label': self.panel_label_font, 'intrct': self.panel_intrct_font}
         self.font_color = {'head' : self.panel_head_color, 'sub' : self.panel_sub_color, 'label': self.panel_border_color, 'intrct': self.panel_head_color}
-        self.font_bckg_color = {'head' : self.panel_color, 'sub' : self.panel_color, 'label': self.panel_border_color, 'intrct': self.panel_head_color}
 
         # Button (Subset of Text)
         self.button_padding = 20

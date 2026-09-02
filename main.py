@@ -86,13 +86,13 @@ class GeniusArcade:
 
     def setup_menu_bar_text(self):
         display = '--:--'
-        self.select_diff = MenuBar(self, f'Difficulty: {display}', 0.025)
-        self.how_to_play = MenuBar(self, 'How to Play?', 0.167)
-        self.score = MenuBar(self, f'Score: {display}', 0.309)
-        self.high_score = MenuBar(self, f'High Score: {display}', 0.451)
-        self.game_round = MenuBar(self, f'round: {display}', 0.593)
-        self.remaining_balls = MenuBar(self, f'Balls: {display}', 0.735)
-        self.heart_level = MenuBar(self, f'hearts:', 0.875)
+        self.select_diff = MenuBar(self, f'Difficulty: {display}', text_spacing=0)
+        self.how_to_play = MenuBar(self, 'How to Play?', self.select_diff.rect.right)
+        self.score = MenuBar(self, f'Score: {display}', self.how_to_play.rect.right)
+        self.high_score = MenuBar(self, f'High Score: {display}', self.score.rect.right)
+        self.game_round = MenuBar(self, f'round: {display}', self.high_score.rect.right)
+        self.remaining_balls = MenuBar(self, f'Balls: {display}', self.game_round.rect.right)
+        self.heart_level = MenuBar(self, f'hearts:', self.remaining_balls.rect.right)
 
     def setup_menu_panel_txt(self):
         if not self.launched_game:

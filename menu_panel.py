@@ -2,7 +2,7 @@ import pygame
 
 class MenuPanel():
     '''Responsible for the game's menu panel texts and icons'''
-    def __init__(self, game_instance, message, offset_y, font='head', color = None): # type of text on panel
+    def __init__(self, game_instance, message, offset_y, font, color = None): # type of text on panel
         self.screen = game_instance.screen
         self.settings = game_instance.settings
         self.panel = game_instance.menu_panel
