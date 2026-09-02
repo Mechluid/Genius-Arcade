@@ -293,10 +293,10 @@ class GeniusArcade:
             for bar in self.bars.copy():
                 bar.update(self.current_bar_speed)
 
+# TODO: 
     def change_bar_speed(self, change_factor = None):
         if not change_factor:
-            self.bonus_multiplier = 1 + (self.settings.speed_increase * self.stats.game_round)
-            self.current_bar_speed = self.bonus_multiplier * self.settings.bar_start_speed
+            self.current_bar_speed = self.settings.bar_start_speed
         else:
             self.current_bar_speed *= (1 + self.settings.failure_factor)
 
@@ -427,6 +427,26 @@ class GeniusArcade:
         self.heart_level.show_text()
         self.remaining_balls.show_text()
 
+    def countdown_timer(self):
+        if not self.start_game:
+            balls_left = self.settings.ball_count - len(self.balls)
+            if balls_left > 0:
+                # Triggers at 30%, but guarantees a minimum of 4 balls so 3, 2, 1, and GO all display
+                trigger_threshold = max(4, self.settings.ball_count * 0.30)
+                if balls_left <= trigger_threshold:
+                    # DImming the screen
+                    overlay = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
+                    overlay.fill((0, 0, 0, 150))
+                    self.screen.blit(overlay, (0, 0))
+                    # splitting the threshold into perfect quarters
+                    for multiplier, displayed_txt, text_color in self.settings.countdown_phases:
+                        if balls_left > trigger_threshold * multiplier:
+                            break
+                    # Drawing the text over the overlay
+                    text_surface = self.settings.count_down_font.render(displayed_txt, True, text_color)
+                    text_rect = text_surface.get_rect(center = self.screen.get_rect().center)
+                    self.screen.blit(text_surface, text_rect)
+
     def screen_update(self):
         '''Updates screeen changes after each loop'''
         self.background_color_fill()
@@ -446,6 +466,7 @@ class GeniusArcade:
                 for index, heart in enumerate(sorted(self.hearts, key=lambda h: h.rect.x)):
                     if index < self.stats.heart_num:
                         heart.draw()
+                self.countdown_timer()
             else:
                 self.screen.fill(self.settings.panel_color, self.menu_panel)
                 color = self.settings.panel_border_color
@@ -460,7 +481,7 @@ class GeniusArcade:
                 self.start.show_text()
                 self.diff_interact.draw_button(self.settings.panel_head_color)
                 self.diff_interact.show_text()
-        if self.end_game:
+        else:
             self.screen.fill(self.settings.panel_border_color, self.g_o_panel)
             self.game_over_txt.show_text()
             self.result.show_text()
