@@ -26,10 +26,6 @@ class Settings:
 
         # Bar speed Factors
         self.failure_factor = 0.02 # 2% increase in speed each time a question goes unanswered
-        
-        self.incorrect_answer_factor = 1.15 # THis was gotten using the square root of the (bar speed of round + 1/ bar speed of ROund)
-        # this is to ensure that after 5 loss (Failure to provide answer during the given time), the bar speed is just about the
-        # bar speed of the next level
 
         # Spike
         self.spike_color = (253, 184, 19)
@@ -44,13 +40,13 @@ class Settings:
         self.text_color = (230, 230, 235)
         # Using a monospaced technical font for the math/HUD
         self.text_font = pygame.font.SysFont('consolas', 48, bold=True)
-        self.bar_txt_font = pygame.font.SysFont('consolas', 34, bold=True)
+        self.bar_txt_font = pygame.font.SysFont('consolas', 28, bold=True)
         self.panel_head_font = pygame.font.SysFont('trebuchetms', 60, bold= True)
         self.panel_sub_font = pygame.font.SysFont('trebuchetms', 35)
         self.panel_label_font = pygame.font.SysFont('trebuchetms', 50, bold= True)
         self.panel_intrct_font = pygame.font.SysFont('trebuchetms', 28, bold= True)
         self.panel_head_color = (255, 255, 255)
-        self.panel_sub_color = (155, 170, 185)
+        self.panel_sub_color = (210, 215, 225)
         self.txt_delay_ms = 5000 # 5ms
 
         # Game Over font setting
@@ -70,7 +66,10 @@ class Settings:
         self.font_bckg_color = {'head' : self.panel_color, 'sub' : self.panel_color, 'label': self.panel_border_color, 'intrct': self.panel_head_color}
 
         # Button (Subset of Text)
-        self.button_padding = 50
+        self.button_padding = 20
+        self.button_color = (0, 212, 175)
+        self.button_border_color = (95, 194, 232)
+        self.button_width = 350
 
         # Question (Subset of Text)
         self.qn_distance = 100 # Distance of the question from the bottom of the screen

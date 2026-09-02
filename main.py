@@ -100,9 +100,9 @@ class GeniusArcade:
             sub_txt = 'Solve Fast. Pop the ball. Beat the Clock.'
             self.header = MenuPanel(self, header_txt, 0.3, font= 'head')
             self.sub = MenuPanel(self, sub_txt, 0.5, font= 'sub')
-            self.start = MenuPanel(self, 'Start Game', 0.7, font= 'label', color= 'head')
+            self.start = MenuPanel(self, 'Start Game', 0.8, font= 'label', color= 'head')
             self.start.button()
-            self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.6, font= 'intrct', color= 'sub')
+            self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
             self.diff_interact.button()
 
     def create_game_over_txt(self):
@@ -477,9 +477,9 @@ class GeniusArcade:
                 pygame.draw.line(self.screen, color, p.bottomleft,p.bottomright, t)  # bottom
                 self.header.show_text()
                 self.sub.show_text()
-                self.start.draw_button(self.settings.panel_border_color)
+                self.start.draw_button()
                 self.start.show_text()
-                self.diff_interact.draw_button(self.settings.panel_head_color)
+                self.diff_interact.draw_button()
                 self.diff_interact.show_text()
         else:
             self.screen.fill(self.settings.panel_border_color, self.g_o_panel)

@@ -13,17 +13,14 @@ class MenuBar:
 
     def prep_menu_bar_text(self):
         self.image = self.settings.bar_txt_font.render(self.message.title(), True, 
-                                                    self.settings.text_color, self.settings.screen_bottom_color)
-        self.rect = self.image.get_rect()
-        self.rect.x =  self.offset_x * self.screen.get_rect().width
-        self.rect.centery = self.top_menu_bar.centery
+                                                    self.settings.text_color)
+        self.image_rect = self.image.get_rect()
+        self.image_rect.x =  self.offset_x * self.screen.get_rect().width
+        self.image_rect.centery = self.top_menu_bar.centery
 
     def button(self):
-        self.button_width, self.button_height = ((self.rect.width + self.settings.button_padding), 
-                                                 (self.rect.height + self.settings.button_padding))
-        self.button_rect = pygame.Rect(0, 0, self.button_width, self.button_height)
-        self.button_rect.center = self.rect.center
-        self.corner_radius = self.button_height // 2
+        self.button_rect = self.image_rect.inflate(30, 10)
+        self.button_rect.center = self.image_rect.center
 
     def update(self, message):
         '''Handles the changes occuring on the menu bar'''
@@ -32,5 +29,6 @@ class MenuBar:
         self.button()
         
     def show_text(self):
-        pygame.draw.rect(self.screen, self.settings.screen_bottom_color, self.button_rect, border_radius=self.corner_radius)
-        self.screen.blit(self.image, self.rect)
+        pygame.draw.rect(self.screen, self.settings.button_color, self.button_rect, border_radius=8)
+        pygame.draw.rect(self.screen, self.settings.button_border_color, self.button_rect, width=2, border_radius=8)
+        self.screen.blit(self.image, self.image_rect)
