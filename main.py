@@ -275,7 +275,7 @@ class GeniusArcade:
             '''This starts the game (Spawning of the questions the user has to answer)'''
             if len(self.balls) >= self.settings.ball_count and not self.start_game:
                 self.start_game = True
-                self.current_bar_speed = self.settings.bar_start_speed * self.stats.game_round
+                self.change_bar_speed()
                 self.previous_best = self.stats.high_score
                 self.qn_update_time = self.current_time
 
@@ -288,13 +288,17 @@ class GeniusArcade:
         self.update_bar()
 
     def update_bar(self):
-        '''Handle the movement of the bar when in contact with a ball'''
+        '''Handle the movement of the bar trapping the balls'''
         if self.start_game:
             for bar in self.bars.copy():
                 bar.update(self.current_bar_speed)
 
-    def change_bar_speed(self, change_factor):
-        self.current_bar_speed *= change_factor
+    def change_bar_speed(self, change_factor = None):
+        if not change_factor:
+            self.bonus_multiplier = 1 + (self.settings.speed_increase * self.stats.game_round)
+            self.current_bar_speed = self.bonus_multiplier * self.settings.bar_start_speed
+        else:
+            self.current_bar_speed *= (1 + self.settings.failure_factor)
 
     def update_spikes(self):
         '''
@@ -372,7 +376,7 @@ class GeniusArcade:
 
             if (self.current_time - self.qn_update_time) >= self.settings.txt_delay_ms:
                 self.clear_qn_ans()
-                self.change_bar_speed(self.settings.incorrect_answer_factor)
+                self.change_bar_speed('failure')
 
     def update_game_over_txt(self):
         self.game_over_txt.update(0.5)
@@ -389,6 +393,7 @@ class GeniusArcade:
         self.balls.empty()
         self.last_update_time = self.current_time
 
+# TODO: Working on editing this  method to adjust the bar speed for the next round
     def finish_game_round(self):
         if not self.balls:
             self.stats.game_round += 1
@@ -396,6 +401,7 @@ class GeniusArcade:
             self.get_ball_count()
             self.game_round.update(f'round: {self.stats.game_round}')
             self.update_ball_elements()
+            self.change_bar_speed()
 
     def get_ball_count(self):
         '''To get ball count for a particular round'''

@@ -19,12 +19,15 @@ class Settings:
         self.ball_diff_factor = None
         self.a_y = 0.1 # The change in ball's velocity with time in y axis
         self.a_x = 0.3 # The chnage in ball's velocity with time in x axis
-        self.ball_delay_ms = 3000 # 3ms
+        self.ball_delay_ms = 500 # 0.5ms
 
         # Bar
         self.bar_color = (230, 90, 70)
         self.bar_start_speed = 0.5
+        self.speed_increase = 0.1 # 10% increase per round
+
         # Bar speed Factors
+        self.failure_factor = 0.02 # 2% increase in speed each time a question goes unanswered
         
         self.incorrect_answer_factor = 1.15 # THis was gotten using the square root of the (bar speed of round + 1/ bar speed of ROund)
         # this is to ensure that after 5 loss (Failure to provide answer during the given time), the bar speed is just about the
