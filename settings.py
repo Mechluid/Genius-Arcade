@@ -80,8 +80,8 @@ class Settings:
         # to bring it visibly on the screen
         
         # Answer (Subset of Text)
-        self.answer_x_offset = 30   # how far along the line the typed answer starts
-        self.answer_y_offset = 2     # nudge so the answer sits ON the line, not above it
+        self.answer_x_offset = 50   # how far along the line the typed answer starts
+        self.answer_y_offset = 7     # nudge so the answer sits ON the line, not above it
 
         # countdown
         self.count_down_font = pygame.font.SysFont('impact', 300)
