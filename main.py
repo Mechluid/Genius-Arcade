@@ -48,7 +48,6 @@ class GeniusArcade:
         self.clock = pygame.time.Clock()
 
     def important_game_flags(self):
-        self.game_state = 'menu'
         self.launched_game = False # Tracks if the start button has been clicked
         self.start_game = False # Tracks if the game is started (When the gameplay begins)
         self.end_game = False # Tracks if the game has ended
@@ -191,6 +190,7 @@ class GeniusArcade:
         if self.start.button_rect.collidepoint(mouse_pos):
             self.launched_game = True
             self.check_game_mode_attr()
+            self.previous_best = self.stats.high_score # Captures the previous best score before the game starts
             self.stats.reset_stats()
             self.setting_game_stats()
             self.reset_game_entities()
@@ -260,6 +260,7 @@ class GeniusArcade:
         if play_again_bttn_clicked and self.end_game:
             self.end_game = False
             self.create_bar()
+            self.previous_best = self.stats.high_score # Capture the previous best score before the user plays again
             self.reset_game_entities() # This reset a bar not moving, will comeback to it
             self.update_ball_elements()
             self.stats.reset_stats()
@@ -332,7 +333,6 @@ class GeniusArcade:
             if len(self.balls) >= self.settings.ball_count and not self.start_game:
                 self.start_game = True
                 self.change_bar_speed()
-                self.previous_best = self.stats.high_score
                 self.qn_update_time = self.current_time
 
     def update_entities(self):
