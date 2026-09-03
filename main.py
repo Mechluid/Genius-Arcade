@@ -51,6 +51,10 @@ class GeniusArcade:
         self.launched_game = False
         self.start_game = False
         self.end_game = False
+        self.dropdown_open = False # Tracks if the difficulty list is visible
+        self.easy_mode = False
+        self.hard_mode = False
+        self.medium_mode = False
 
     def game_entities(self):
         self.bars = pygame.sprite.Group()
@@ -104,6 +108,33 @@ class GeniusArcade:
             self.start.button()
             self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
             self.diff_interact.button()
+            self.drop_down_texts()
+
+    def drop_down_texts(self):
+        # Getting the width and x postion of the main difficulty button.
+        drop_width = self.diff_interact.button_rect.width
+        drop_x = self.diff_interact.button_rect.centerx
+        gap = 4 # the spacing between the difficulty buttons
+        self.opt_easy = MenuPanel(self, 'Easy', 0.65, font='intrct', color='head')
+        self.opt_easy.button()
+        self.opt_easy.button_rect.width = drop_width
+        self.opt_easy.button_rect.centerx = drop_x
+        self.opt_easy.button_rect.top = self.diff_interact.button_rect.bottom + gap
+        self.opt_easy.rect.center = self.opt_easy.button_rect.center
+
+        self.opt_med = MenuPanel(self, 'Medium', 0.65, font='intrct', color='head')
+        self.opt_med.button()
+        self.opt_med.button_rect.width = drop_width
+        self.opt_med.button_rect.centerx = drop_x
+        self.opt_med.button_rect.top = self.opt_easy.button_rect.bottom + gap
+        self.opt_med.rect.center = self.opt_med.button_rect.center
+
+        self.opt_hard = MenuPanel(self, 'Hard', 0.65, font='intrct', color='head')
+        self.opt_hard.button()
+        self.opt_hard.button_rect.width = drop_width
+        self.opt_hard.button_rect.centerx = drop_x
+        self.opt_hard.button_rect.top = self.opt_med.button_rect.bottom + gap
+        self.opt_hard.rect.center = self.opt_hard.button_rect.center
 
     def create_game_over_txt(self):
         self.game_over_txt = GameOver(self, 'Game Over!!!', 0.5, 'main')
@@ -150,21 +181,46 @@ class GeniusArcade:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if not self.launched_game:
-                    self.check_start_game_button(mouse_pos)
+                    self.check_menu_clicks(mouse_pos)
                 else:
                     self.check_play_again_button(mouse_pos)
                     self.check_main_menu_bttn(mouse_pos)
 
-    def check_start_game_button(self, mouse_pos):
-        start_button_clicked = self.start.button_rect.collidepoint(mouse_pos)
-        if start_button_clicked and not self.launched_game:
-            self.launched_game = True
-            self.stats.reset_stats()
-            self.setting_game_stats()
-            self.reset_game_entities()
-            self.update_ball_elements()
-            if not self.bars:
-                self.create_bar()
+    def check_menu_clicks(self, mouse_pos):
+        if not self.launched_game:
+            if self.dropdown_open:
+                if self.opt_easy.button_rect.collidepoint(mouse_pos):
+                    self.diff_interact.update('Easy')
+                    self.medium_mode = False
+                    self.hard_mode = False
+                    self.easy_mode = True
+                elif self.opt_med.button_rect.collidepoint(mouse_pos):
+                    self.diff_interact.update('Medium')
+                    self.easy_mode = False
+                    self.hard_mode = False
+                    self.medium_mode = True
+                elif self.opt_hard.button_rect.collidepoint(mouse_pos):
+                    self.diff_interact.update('Hard')
+                    self.easy_mode = False
+                    self.medium_mode = False
+                    self.hard_mode = True
+            
+                # Close the dropdown regardless of where they clicked
+                self.dropdown_open = False
+            # Dropdown closed
+            else:
+                if self.start.button_rect.collidepoint(mouse_pos):
+                    self.launched_game = True
+                    self.check_game_mode_attr()
+                    self.stats.reset_stats()
+                    self.setting_game_stats()
+                    self.reset_game_entities()
+                    self.update_ball_elements()
+                    if not self.bars:
+                        self.create_bar()
+                elif self.diff_interact.button_rect.collidepoint(mouse_pos):
+                    self.dropdown_open = True
+
 
     def update_ball_elements(self):
         '''Update both actual ball in the group and ball's onscreen text'''
@@ -271,6 +327,18 @@ class GeniusArcade:
                 self.last_update_time = self.current_time
             self.game_ready()
 
+    def check_game_mode_attr(self):
+        if self.easy_mode:
+            self.added_balls, self.bar_start_speed = self.settings.game_mode_attr['easy']
+            game_mode_txt = f'Difficulty: Easy'
+        elif self.medium_mode:
+            self.added_balls, self.bar_start_speed = self.settings.game_mode_attr['medium']
+            game_mode_txt = f'Difficulty: Medium'
+        elif self.hard_mode:
+            self.added_balls, self.bar_start_speed = self.settings.game_mode_attr['hard']
+            game_mode_txt = f'Difficulty: Hard'
+        self.select_diff.update(game_mode_txt)
+
     def game_ready(self):
             '''This starts the game (Spawning of the questions the user has to answer)'''
             if len(self.balls) >= self.settings.ball_count and not self.start_game:
@@ -296,7 +364,7 @@ class GeniusArcade:
 # TODO: 
     def change_bar_speed(self, change_factor = None):
         if not change_factor:
-            self.current_bar_speed = self.settings.bar_start_speed
+            self.current_bar_speed = self.bar_start_speed
         else:
             self.current_bar_speed *= (1 + self.settings.failure_factor)
 
@@ -406,7 +474,7 @@ class GeniusArcade:
     def get_ball_count(self):
         '''To get ball count for a particular round'''
         previous_round = self.stats.game_round - 1
-        self.settings.ball_count += (previous_round * self.settings.added_ball)
+        self.settings.ball_count += (previous_round * self.added_balls)
 
     def reset_game_entities(self):
         if self.start_game:
@@ -481,6 +549,23 @@ class GeniusArcade:
                 self.start.show_text()
                 self.diff_interact.draw_button()
                 self.diff_interact.show_text()
+                # DROPDOWN TEXTS
+                if self.dropdown_open:
+                    dropdown_height = self.opt_hard.button_rect.bottom - self.opt_easy.button_rect.top
+                    # A solid color for the ddifficulty buttons to stay on.
+                    dropdown_bg = pygame.Rect(
+                        self.opt_easy.button_rect.left, 
+                        self.opt_easy.button_rect.top, 
+                        self.opt_easy.button_rect.width, 
+                        dropdown_height
+                    ) # Drawing the background rectangle , pygame.rect(x,y,width, height)
+                    pygame.draw.rect(self.screen, self.settings.panel_color, dropdown_bg)
+                    button_border = self.settings.panel_border_color
+                    for option in [self.opt_easy, self.opt_med, self.opt_hard]:
+                        option.draw_button(self.settings.panel_color)
+                        pygame.draw.rect(self.screen, button_border, option.button_rect, width=2, border_radius=8)
+                        option.show_text()
+                    
         else:
             self.screen.fill(self.settings.panel_border_color, self.g_o_panel)
             self.game_over_txt.show_text()

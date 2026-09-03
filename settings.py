@@ -14,14 +14,18 @@ class Settings:
 
         # Ball
         self.ball_radius = 60 
-        self.added_ball = 5 # Added ball per round
+        self.added_ball_easy = 2 # Added ball per round
+        self.added_ball_medium = 4
+        self.added_ball_hard = 6
         self.a_y = 0.1 # The change in ball's velocity with time in y axis
         self.a_x = 0.3 # The chnage in ball's velocity with time in x axis
         self.ball_delay_ms = 500 # 0.5ms
 
         # Bar
         self.bar_color = (0, 212, 175)
-        self.bar_start_speed = 0.2
+        self.bar_start_speed_easy = 0.2
+        self.bar_start_speed_medium = 0.3
+        self.bar_start_speed_hard = 0.4
         self.speed_increase = 0.1 # 10% increase per round
 
         # Bar speed Factors
@@ -84,12 +88,16 @@ class Settings:
         self.count_down_font_color = (255, 255, 255)
 
         # COuntdown_phases
-        # Define the phases: (multiplier, displayed_text)
+        # Define the phases: (multiplier, displayed_text, font color)
         self.countdown_phases = [
                             (0.75, "3", self.count_down_font_color),
                             (0.50, "2", self.count_down_font_color),
                             (0.25, "1", self.count_down_font_color),
                             (0.00, "GO!", (0, 255, 0))]
+
+        self.game_mode_attr = {'easy':[self.added_ball_easy, self.bar_start_speed_easy],
+                               'medium':[self.added_ball_medium, self.bar_start_speed_medium],
+                               'hard':[self.added_ball_hard, self.bar_start_speed_hard]}
 
     def intitalize_dynamic_settings(self):
         self.ball_count = 5 # The amount of balls in a round
