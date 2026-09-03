@@ -211,6 +211,8 @@ class GeniusArcade:
             else:
                 if self.start.button_rect.collidepoint(mouse_pos):
                     self.launched_game = True
+                    if not (self.easy_mode or self.medium_mode or self.hard_mode):
+                        self.medium_mode = True
                     self.check_game_mode_attr()
                     self.stats.reset_stats()
                     self.setting_game_stats()
