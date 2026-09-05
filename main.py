@@ -12,6 +12,7 @@ from game_stats import GameStats
 from menu_panel import MenuPanel
 from heart import Heart
 from game_over import GameOver
+from form_field import FormField
 
 class GeniusArcade:
     '''
@@ -35,6 +36,7 @@ class GeniusArcade:
         self.create_spikes()
         self.setup_menu_bar_text()
         self.setup_menu_panel_txt()
+        self.setup_login_panel_txt()
         self.create_bar()
         self.create_hearts()
         self.create_game_over_panel()
@@ -93,6 +95,7 @@ class GeniusArcade:
         self.game_round = MenuBar(self, f'round: {display}', self.high_score.rect.right)
         self.remaining_balls = MenuBar(self, f'Balls: {display}', self.game_round.rect.right)
         self.heart_level = MenuBar(self, f'hearts:', self.remaining_balls.rect.right)
+        self.quit_game = MenuBar(self, f'Quit', self.heart_level.rect.right, text_spacing=200)
 
     def setup_menu_panel_txt(self):
         if self.game_state == 'menu':
@@ -105,7 +108,25 @@ class GeniusArcade:
             self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
             self.diff_interact.button()
             self.drop_down_texts()
-
+# TODO
+    def setup_login_panel_txt(self):
+        self.login_header = MenuPanel(self, 'Welcome to Genius Arcade', 0.3, font='head')
+        self.login_sub = MenuPanel(self, 'Please sign in to save your scores', 0.42, font='sub')
+        # FOr the username and password field 
+        self.username_field = FormField(self, 'Username', 0.45)
+        self.password_field = FormField(self, 'Password', 0.57)
+        # Submit field
+        self.login_btn = MenuPanel(self, 'Log in', 0.85, font='sub', color='head')
+        self.login_btn.button()
+        self.login_btn.button_rect.size = self.password_field.rect.size
+        self.login_btn.button_rect.center = self.login_btn.rect.center
+        # reset_password
+        self.reset_btn = MenuPanel(self, 'Forgotten password?', 0.95, font='sub', color='head')
+        self.create_acc = MenuPanel(self, 'Create new account', 1.2, font='sub', color='head')
+        self.create_acc.button()
+        self.create_acc.button_rect.size = self.login_btn.button_rect.size
+        self.create_acc.button_rect.center = self.create_acc.rect.center
+ 
     def drop_down_texts(self):
         '''Customizing the dropdown texts that pop when select difiiculty is clicked'''
         # Getting the width and x postion of the main difficulty button.
@@ -158,21 +179,58 @@ class GeniusArcade:
                 self.update_game_over_txt()
             self.clock.tick(self.settings.frame)
             self.screen_update()
-
+# TODO
     def check_events(self):
         '''Check inputs from the user during the gameplay'''
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                self.key_down_button(event)
+                # '''Check events during a user's keypress'''
+                if event.key == pygame.K_q:
+                    pygame.quit()
+                    sys.exit()
+                elif self.game_state == 'playing':
+                    if event.unicode.isdigit():
+                        pressed_num = str(event.unicode)
+                        self.handling_input_element(pressed_num)
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+                        self.check_answer()
+                        self.finish_game_round()
+                    elif event.key == pygame.K_BACKSPACE:
+                        if self.input_elements:
+                            for input_element in self.input_elements:
+                                input_element.remove_text()
+                elif self.game_state == 'login':
+                    if event.key == pygame.K_BACKSPACE:
+                        # It send the delete command to both fields, of which can be executed if "active"
+                        self.username_field.update_text(delete=True)
+                        self.password_field.update_text(delete=True)
+                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_TAB):
+                        # This ignores these keys so they don't print weird block characters
+                        pass                
+                    else:
+                        # event.unicode captures the actual character typed (including uppercase)
+                        self.username_field.update_text(new_character=event.unicode)
+                        self.password_field.update_text(new_character=event.unicode)
+                
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.game_state == 'menu':
+                if self.quit_game.button_rect.collidepoint(mouse_pos):
+                    pygame.quit()
+                    sys.exit()
+                elif self.game_state == 'menu':
                     self.check_menu_clicks(mouse_pos)
-                if self.game_state == 'game_over':
+                elif self.game_state == 'game_over':
                     self.check_play_again_button(mouse_pos)
                     self.check_main_menu_bttn(mouse_pos)
+                elif self.game_state == 'login':
+                    self.check_login_clicks(mouse_pos)
+
+    def check_login_clicks(self, mouse_pos):
+        '''Helps confirm if a user has clicked a field and changes color in respect'''
+        self.username_field.update_active_state(mouse_pos)
+        self.password_field.update_active_state(mouse_pos)
 
     def check_dropdown_txts(self, mouse_pos):
         if self.opt_easy.button_rect.collidepoint(mouse_pos):
@@ -200,36 +258,18 @@ class GeniusArcade:
             self.dropdown_open = True
 
     def check_menu_clicks(self, mouse_pos):
-        if self.game_state == 'menu':
-            if self.dropdown_open:
-                self.check_dropdown_txts(mouse_pos)
-                # Close the dropdown regardless of where clicked
-                self.dropdown_open = False
-            # Dropdown closed
-            else:
-                self.check_panel_interact_buttons(mouse_pos)
+        if self.dropdown_open:
+            self.check_dropdown_txts(mouse_pos)
+            # Close the dropdown regardless of where clicked
+            self.dropdown_open = False
+        # Dropdown closed
+        else:
+            self.check_panel_interact_buttons(mouse_pos)
 
     def update_ball_elements(self):
         '''Update both actual ball in the group and ball's onscreen text'''
         self.add_up_balls()
         self.update_ball_onscreen()
-
-    def key_down_button(self, event):
-        '''Check events during a user's keypress'''
-        if event.key == pygame.K_q:
-            pygame.quit()
-            sys.exit()
-        elif self.game_state == 'playing':
-            if event.unicode.isdigit():
-                pressed_num = str(event.unicode)
-                self.handling_input_element(pressed_num)
-            elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                self.check_answer()
-                self.finish_game_round()
-            elif event.key == pygame.K_BACKSPACE:
-                if self.input_elements:
-                    for input_element in self.input_elements:
-                        input_element.remove_text()
 
     def check_answer(self):
         '''Check user answer against stored answer'''
@@ -537,10 +577,27 @@ class GeniusArcade:
         self.play_again.show_text()
         self.return_to_menu.draw_button()
         self.return_to_menu.show_text()
+
+    def draw_login_texts(self):
+        self.login_header.show_text()
+        self.login_sub.show_text()
+        self.username_field.draw()
+        self.password_field.draw()
+        self.login_btn.draw_button()
+        self.login_btn.show_text()
+        self.reset_btn.show_text()
+        self.create_acc.draw_button()
+        self.create_acc.show_text()
+
 # TODO
     def screen_update(self):
         '''Updates screen changes after each loop'''
-        self.background_color_fill()
+        if self.game_state != 'login':
+            self.background_color_fill()
+        else:
+            self.screen.fill(self.settings.screen_bottom_color)
+            self.draw_login_texts()
+        self.quit_game.show_text()
         if self.game_state == 'playing':
             self.draw_game_entities()
             self.draw_countdown_timer()

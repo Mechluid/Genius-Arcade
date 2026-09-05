@@ -2,7 +2,7 @@ import pygame
 
 class MenuBar:
     '''Handles the icons and texts displayed on the game's menu bar'''
-    def __init__(self, game_instance, message, offset_x=50, text_spacing=80):
+    def __init__(self, game_instance, message, offset_x=40, text_spacing=60):
         self.screen = game_instance.screen
         self.settings = game_instance.settings
         self.top_menu_bar = game_instance.top_bar_rect

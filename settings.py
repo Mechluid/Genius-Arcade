@@ -87,6 +87,9 @@ class Settings:
         self.count_down_font = pygame.font.SysFont('impact', 300)
         self.count_down_font_color = (255, 255, 255)
 
+        # Login_placeholder_text properties
+        self.placeholder_font = pygame.font.SysFont(None, 36)
+
         # COuntdown_phases
         # Define the phases: (multiplier, displayed_text, font color)
         self.countdown_phases = [

@@ -22,14 +22,14 @@ class MenuPanel():
 
     def prep_menu_panel_txt(self):
         self.check_text_type()
-        self.image = self.font.render(self.message.title(), True,
+        self.image = self.font.render(self.message, True,
                                                          self.text_color)
         self.rect = self.image.get_rect()
         self.rect.centerx = self.panel.centerx
         self.rect.y = self.offset_y * self.panel.height
 
     def update(self, message):
-        '''Handles the changes occuring on the menu bar'''
+        '''Handles the changes occuring on the menu panel'''
         self.message = message
         self.prep_menu_panel_txt()
         self.button()
