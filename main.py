@@ -433,6 +433,7 @@ class GeniusArcade:
             for ball in self.balls:
                 if ball.rect.bottom >= spike.rect.top:
                     ball.kill()
+                    self.update_ball_onscreen()
 
         if not self.bars and not self.balls:
             self.stats.heart_num -= 1
