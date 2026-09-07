@@ -88,6 +88,7 @@ class Settings:
         self.count_down_font_color = (255, 255, 255)
         self.welcome_txt_font = pygame.font.SysFont('impact', 100)
         self.stats_font = pygame.font.SysFont('consolas', 45, bold=True)
+        self.error_font = pygame.font.SysFont('arial', 30)
 
         # Login_placeholder_text properties
         self.placeholder_font = pygame.font.SysFont(None, 36)

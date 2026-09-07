@@ -56,6 +56,7 @@ class GeniusArcade:
         self.start_game = False # Tracks if the game is started (When the gameplay begins)
         self.dropdown_open = False # Tracks if the difficulty list is visible
         self.current_difficulty = 'medium' # Default state difficulty
+        self.show_login_error = False # Prompts the user if credentials are invalid
 
     def game_entities(self):
         self.bars = pygame.sprite.Group()
@@ -127,6 +128,11 @@ class GeniusArcade:
         self.create_acc.button()
         self.create_acc.button_rect.size = self.login_btn.button_rect.size
         self.create_acc.button_rect.center = self.create_acc.rect.center
+        # Error text
+        error_msg = "Invalid login credentials."
+        self.error_surface = self.settings.error_font.render(error_msg, True, (255, 50, 50))
+        self.error_rect = self.error_surface.get_rect()
+        self.error_rect.bottomleft = (self.username_field.rect.left, self.username_field.rect.top - 5)
  
     def drop_down_texts(self):
         '''Customizing the dropdown texts that pop when select difiiculty is clicked'''
@@ -187,7 +193,7 @@ class GeniusArcade:
             if event.type == pygame.QUIT:
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
-                # '''Check events during a user's keypress'''
+                # Check events during a user's keypress
                 if event.key == pygame.K_q:
                     pygame.quit()
                     sys.exit()
@@ -203,6 +209,9 @@ class GeniusArcade:
                             for input_element in self.input_elements:
                                 input_element.remove_text()
                 elif self.game_state == 'login':
+                    # This clears the error message once the keyboard makes an edit
+                    if self.show_login_error:
+                        self.show_login_error = False
                     if event.key == pygame.K_BACKSPACE:
                         # It send the delete command to both fields, of which can be executed if "active"
                         self.username_field.update_text(delete=True)
@@ -217,10 +226,13 @@ class GeniusArcade:
                 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.quit_game.button_rect.collidepoint(mouse_pos):
-                    pygame.quit()
-                    sys.exit()
-                elif self.game_state == 'menu':
+                if self.game_state != 'welcome':
+                    if self.quit_game.button_rect.collidepoint(mouse_pos):
+                        pygame.quit()
+                        sys.exit()
+                else:
+                    self.check_continue_bttn(mouse_pos)
+                if self.game_state == 'menu':
                     self.check_menu_clicks(mouse_pos)
                 elif self.game_state == 'game_over':
                     self.check_play_again_button(mouse_pos)
@@ -244,9 +256,13 @@ class GeniusArcade:
                 snapshot = self.screen.copy()
                 tiny = pygame.transform.smoothscale(snapshot, (self.screen_width // 10, self.screen_height // 10))
                 self.blurred_background = pygame.transform.smoothscale(tiny, (self.screen_width, self.screen_height))
-                # Helps to deal with game state transition from "welcome", which is the time the welcome screen remains on the display,
-                # and "menu", the gamestate that shows the game menu.
-                self.welcome_timer_start = pygame.time.get_ticks()
+
+                # Create the continue button to switch game stats from welcome game state to menu state
+                self.continue_btn = MenuPanel(self, "Continue", 0, font='intrct', color='head')
+                self.continue_btn.button()
+                self.continue_btn.button_rect.bottomright = (self.screen_width - 30, self.screen_height - 30)
+                self.continue_btn.rect.center = self.continue_btn.button_rect.center
+
                 # If it matches, there is a game state chnage.
                 self.game_state = 'welcome'
             else:
@@ -286,6 +302,12 @@ class GeniusArcade:
         # Dropdown closed
         else:
             self.check_panel_interact_buttons(mouse_pos)
+
+    def check_continue_bttn(self, mouse_pos):
+        '''Responsible for switching game state from the welcome screen to the menu game state/screen'''
+        print('switch')
+        if self.continue_btn.button_rect.collidepoint(mouse_pos):
+            self.game_state = 'menu'
 
     def update_ball_elements(self):
         '''Update both actual ball in the group and ball's onscreen text'''
@@ -605,6 +627,9 @@ class GeniusArcade:
         self.login_sub.show_text()
         self.username_field.draw()
         self.password_field.draw()
+        # Draws the error once the flag is True
+        if self.show_login_error:
+            self.screen.blit(self.error_surface, self.error_rect)
         self.login_btn.draw_button()
         self.login_btn.show_text()
         self.reset_btn.show_text()
@@ -613,7 +638,7 @@ class GeniusArcade:
 
     def draw_welcome_dashboard(self):
         # Renders the welcome text on top of the blurred background
-        welcome_txt = f"Welcome back, {self.active_user}!"
+        welcome_txt = f"Welcome back, {self.active_user.title()}!"
         txt_color = self.settings.count_down_font_color
         text_surface = self.settings.welcome_txt_font.render(welcome_txt, True, txt_color)
         text_rect = text_surface.get_rect(center=(self.screen_width // 2, (self.screen_height // 3 - 20)))
@@ -638,21 +663,17 @@ class GeniusArcade:
             round_rect = round_surf.get_rect(center=(x_positions[i], base_y + 40))
             self.screen.blit(round_surf, round_rect)
             
-            # Draw Highest Score fir the mode column
+            # Draw Highest Score for the mode column
             score_surf = self.settings.stats_font.render("Highest score - *", True, (255, 255, 255))
             score_rect = score_surf.get_rect(center=(x_positions[i], base_y + 80))
             self.screen.blit(score_surf, score_rect)
-        # game state transitions once the welcome screen has exceeded its duration
-        if self.current_time - self.welcome_timer_start > 3000:
-            self.game_state = "menu"
 
     def draw_welcome_state(self):
          # Draws the blurred background
         self.screen.blit(self.blurred_background, (0, 0))
         self.draw_welcome_dashboard()
-        # game state transitions once the welcome screen has exceeded its duration
-        if self.current_time - self.welcome_timer_start > 30000:
-            self.game_state = "menu"
+        self.continue_btn.draw_button()
+        self.continue_btn.show_text()
 
 # TODO
     def screen_update(self):
