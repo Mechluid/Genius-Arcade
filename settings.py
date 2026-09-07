@@ -83,9 +83,11 @@ class Settings:
         self.answer_x_offset = 50   # how far along the line the typed answer starts
         self.answer_y_offset = 7     # nudge so the answer sits ON the line, not above it
 
-        # countdown
+        # Game state fonts
         self.count_down_font = pygame.font.SysFont('impact', 300)
         self.count_down_font_color = (255, 255, 255)
+        self.welcome_txt_font = pygame.font.SysFont('impact', 100)
+        self.stats_font = pygame.font.SysFont('consolas', 45, bold=True)
 
         # Login_placeholder_text properties
         self.placeholder_font = pygame.font.SysFont(None, 36)

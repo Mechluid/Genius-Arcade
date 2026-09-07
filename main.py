@@ -13,6 +13,7 @@ from menu_panel import MenuPanel
 from heart import Heart
 from game_over import GameOver
 from form_field import FormField
+from data_manager import DataManager
 
 class GeniusArcade:
     '''
@@ -27,6 +28,7 @@ class GeniusArcade:
         pygame.init()
         self.initialize_window_properties()
         self.settings = Settings()
+        self.data_manager = DataManager()
         self.important_game_flags()
         self.stats = GameStats(self)
         self.create_panel_attribute()
@@ -50,7 +52,7 @@ class GeniusArcade:
         self.clock = pygame.time.Clock()
 
     def important_game_flags(self):
-        self.game_state = 'menu'
+        self.game_state = 'login'
         self.start_game = False # Tracks if the game is started (When the gameplay begins)
         self.dropdown_open = False # Tracks if the difficulty list is visible
         self.current_difficulty = 'medium' # Default state difficulty
@@ -98,17 +100,16 @@ class GeniusArcade:
         self.quit_game = MenuBar(self, f'Quit', self.heart_level.rect.right, text_spacing=200)
 
     def setup_menu_panel_txt(self):
-        if self.game_state == 'menu':
-            header_txt = 'Test Your Maths Knowledge'
-            sub_txt = 'Solve Fast. Pop the ball. Beat the Clock.'
-            self.header = MenuPanel(self, header_txt, 0.3, font= 'head')
-            self.sub = MenuPanel(self, sub_txt, 0.5, font= 'sub')
-            self.start = MenuPanel(self, 'Start Game', 0.8, font= 'label', color= 'head')
-            self.start.button()
-            self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
-            self.diff_interact.button()
-            self.drop_down_texts()
-# TODO
+        header_txt = 'Test Your Maths Knowledge'
+        sub_txt = 'Solve Fast. Pop the ball. Beat the Clock.'
+        self.header = MenuPanel(self, header_txt, 0.3, font= 'head')
+        self.sub = MenuPanel(self, sub_txt, 0.5, font= 'sub')
+        self.start = MenuPanel(self, 'Start Game', 0.8, font= 'label', color= 'head')
+        self.start.button()
+        self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
+        self.diff_interact.button()
+        self.drop_down_texts()
+
     def setup_login_panel_txt(self):
         self.login_header = MenuPanel(self, 'Welcome to Genius Arcade', 0.3, font='head')
         self.login_sub = MenuPanel(self, 'Please sign in to save your scores', 0.42, font='sub')
@@ -231,6 +232,26 @@ class GeniusArcade:
         '''Helps confirm if a user has clicked a field and changes color in respect'''
         self.username_field.update_active_state(mouse_pos)
         self.password_field.update_active_state(mouse_pos)
+        if self.login_btn.button_rect.collidepoint(mouse_pos):
+            # Grabbing the user typed text to be used for comparison
+            entered_username = self.username_field.input_text
+            entered_password = self.password_field.input_text
+            # Passing the input text inorder to compare against the saved user's details
+            if self.data_manager.verify_login(entered_username, entered_password):
+                # Saving the current user, so every other details of the user synces automatically 
+                self.active_user = entered_username
+                # Generate a blurred background for the welcome text to be displayed on after login
+                snapshot = self.screen.copy()
+                tiny = pygame.transform.smoothscale(snapshot, (self.screen_width // 10, self.screen_height // 10))
+                self.blurred_background = pygame.transform.smoothscale(tiny, (self.screen_width, self.screen_height))
+                # Helps to deal with game state transition from "welcome", which is the time the welcome screen remains on the display,
+                # and "menu", the gamestate that shows the game menu.
+                self.welcome_timer_start = pygame.time.get_ticks()
+                # If it matches, there is a game state chnage.
+                self.game_state = 'welcome'
+            else:
+                # This shows a failure pop up text, showing 'Invalid credentials' prompting the user to check the input text.
+                self.show_login_error = True
 
     def check_dropdown_txts(self, mouse_pos):
         if self.opt_easy.button_rect.collidepoint(mouse_pos):
@@ -590,6 +611,49 @@ class GeniusArcade:
         self.create_acc.draw_button()
         self.create_acc.show_text()
 
+    def draw_welcome_dashboard(self):
+        # Renders the welcome text on top of the blurred background
+        welcome_txt = f"Welcome back, {self.active_user}!"
+        txt_color = self.settings.count_down_font_color
+        text_surface = self.settings.welcome_txt_font.render(welcome_txt, True, txt_color)
+        text_rect = text_surface.get_rect(center=(self.screen_width // 2, (self.screen_height // 3 - 20)))
+        self.screen.blit(text_surface, text_rect)
+        # Subtext
+        sub_txt = "Let's pick up where you left off..." 
+        sub_surf = self.settings.stats_font.render(sub_txt, True, (180, 220, 255))
+        sub_rect = sub_surf.get_rect(center=(self.screen_width // 2, (self.screen_height // 3 + 50)))
+        self.screen.blit(sub_surf, sub_rect)
+        # Drawing player last saved stats on the welcome back screen.
+        modes = ["Easy", "Medium", "Hard"]
+        x_positions = [self.screen_width // 4, self.screen_width // 2, (self.screen_width * 3 // 4)]
+        base_y = self.screen_height // 2 + 20
+        for i, mode in enumerate(modes):
+            # Draws the mode title, putting the stats in its column
+            mode_surf = self.settings.stats_font.render(mode, True, (200, 200, 200)) # Slightly dimmed color
+            mode_rect = mode_surf.get_rect(center=(x_positions[i], base_y))
+            self.screen.blit(mode_surf, mode_rect)
+            
+            # Draw Highest Round for the mode column
+            round_surf = self.settings.stats_font.render("Highest round - *", True, (255, 255, 255))
+            round_rect = round_surf.get_rect(center=(x_positions[i], base_y + 40))
+            self.screen.blit(round_surf, round_rect)
+            
+            # Draw Highest Score fir the mode column
+            score_surf = self.settings.stats_font.render("Highest score - *", True, (255, 255, 255))
+            score_rect = score_surf.get_rect(center=(x_positions[i], base_y + 80))
+            self.screen.blit(score_surf, score_rect)
+        # game state transitions once the welcome screen has exceeded its duration
+        if self.current_time - self.welcome_timer_start > 3000:
+            self.game_state = "menu"
+
+    def draw_welcome_state(self):
+         # Draws the blurred background
+        self.screen.blit(self.blurred_background, (0, 0))
+        self.draw_welcome_dashboard()
+        # game state transitions once the welcome screen has exceeded its duration
+        if self.current_time - self.welcome_timer_start > 30000:
+            self.game_state = "menu"
+
 # TODO
     def screen_update(self):
         '''Updates screen changes after each loop'''
@@ -599,9 +663,8 @@ class GeniusArcade:
             self.screen.fill(self.settings.screen_bottom_color)
             self.draw_login_texts()
         self.quit_game.show_text()
-        if self.game_state == 'playing':
-            self.draw_game_entities()
-            self.draw_countdown_timer()
+        if self.game_state == 'welcome':
+            self.draw_welcome_state()
         elif self.game_state == 'menu':
             self.draw_panel_txts()
             # DROPDOWN TEXTS
@@ -620,6 +683,9 @@ class GeniusArcade:
                     option.draw_button(self.settings.panel_color)
                     pygame.draw.rect(self.screen, button_border, option.button_rect, width=2, border_radius=8)
                     option.show_text()     
+        elif self.game_state == 'playing':
+            self.draw_game_entities()
+            self.draw_countdown_timer()
         elif self.game_state == 'game_over':
             self.draw_game_over_txts()
         pygame.display.flip()
