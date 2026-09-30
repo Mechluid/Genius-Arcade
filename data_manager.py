@@ -33,6 +33,14 @@ class DataManager:
         # Saving the new user information to the database
         self.save_users()
         return True # This to help with my pop up , once true, "Use profile created successfully"
+
+    def update_user_password(self, username, new_password):
+        '''Updates the user password and saves to the database.'''
+        if username in self.users:
+            self.users[username]['password'] = new_password
+            self.save_users()
+            return True
+        return False
         
     def verify_login(self, username, password):
         '''Checks if username exists and password matches during user login'''

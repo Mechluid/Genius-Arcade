@@ -60,6 +60,12 @@ class FormField:
                 self.input_text += new_character
             self.prep_placholder_txt()
 
+    def clear_text(self):
+        self.input_text = ''
+        self.active = False
+        self.current_color = self.color_inactive
+        self.prep_placholder_txt()
+
     def draw(self):
         '''Draws the field and placeholder text to the scene'''
         pygame.draw.rect(self.screen, self.settings.panel_color, self.rect) # draws the field box 

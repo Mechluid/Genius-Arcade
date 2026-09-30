@@ -38,7 +38,9 @@ class GeniusArcade:
         self.create_spikes()
         self.setup_menu_bar_text()
         self.setup_menu_panel_txt()
-        self.setup_login_panel_txt()
+        self.setup_login_panel_entities()
+        self.setup_reset_panel_entities()
+        self.setup_acc_creation_entities()
         self.create_bar()
         self.create_hearts()
         self.create_game_over_panel()
@@ -57,6 +59,12 @@ class GeniusArcade:
         self.dropdown_open = False # Tracks if the difficulty list is visible
         self.current_difficulty = 'medium' # Default state difficulty
         self.show_login_error = False # Prompts the user if credentials are invalid
+        self.show_reset_error = False 
+        # Tracks navigation history for automatic back navigation
+        self.state_history = []
+        self.reset_phase = 1
+        self.create_phase = 1
+        self.show_create_error = False
 
     def game_entities(self):
         self.bars = pygame.sprite.Group()
@@ -91,9 +99,9 @@ class GeniusArcade:
 
     def setup_menu_bar_text(self):
         display = '--:--'
-        self.select_diff = MenuBar(self, f'Difficulty: {display}', text_spacing=0)
-        self.how_to_play = MenuBar(self, 'How to Play?', self.select_diff.rect.right)
-        self.score = MenuBar(self, f'Score: {display}', self.how_to_play.rect.right)
+        self.back_button = MenuBar(self, 'Back', 0, text_spacing=20)
+        self.select_diff = MenuBar(self, f'Difficulty: {display}', self.back_button.rect.right)
+        self.score = MenuBar(self, f'Score: {display}', self.select_diff.rect.right)
         self.high_score = MenuBar(self, f'High Score: {display}', self.score.rect.right)
         self.game_round = MenuBar(self, f'round: {display}', self.high_score.rect.right)
         self.remaining_balls = MenuBar(self, f'Balls: {display}', self.game_round.rect.right)
@@ -110,8 +118,8 @@ class GeniusArcade:
         self.diff_interact = MenuPanel(self, 'Select Difficulty', 0.65, font= 'intrct', color= 'sub')
         self.diff_interact.button()
         self.drop_down_texts()
-
-    def setup_login_panel_txt(self):
+#TODO
+    def setup_login_panel_entities(self):
         self.login_header = MenuPanel(self, 'Welcome to Genius Arcade', 0.3, font='head')
         self.login_sub = MenuPanel(self, 'Please sign in to save your scores', 0.42, font='sub')
         # FOr the username and password field 
@@ -123,17 +131,55 @@ class GeniusArcade:
         self.login_btn.button_rect.size = self.password_field.rect.size
         self.login_btn.button_rect.center = self.login_btn.rect.center
         # reset_password
-        self.reset_btn = MenuPanel(self, 'Forgotten password?', 0.95, font='sub', color='head')
+        self.reset_pass = MenuPanel(self, 'Forgotten password?', 0.95, font='sub', color='head')
         self.create_acc = MenuPanel(self, 'Create new account', 1.2, font='sub', color='head')
         self.create_acc.button()
         self.create_acc.button_rect.size = self.login_btn.button_rect.size
         self.create_acc.button_rect.center = self.create_acc.rect.center
         # Error text
         error_msg = "Invalid login credentials."
-        self.error_surface = self.settings.error_font.render(error_msg, True, (255, 50, 50))
-        self.error_rect = self.error_surface.get_rect()
-        self.error_rect.bottomleft = (self.username_field.rect.left, self.username_field.rect.top - 5)
- 
+        self.login_error_surface = self.settings.error_font.render(error_msg, True, (255, 50, 50))
+        self.login_error_rect = self.login_error_surface.get_rect()
+        self.login_error_rect.bottomleft = (self.username_field.rect.left, self.username_field.rect.top - 5)
+
+    def setup_reset_panel_entities(self):
+        self.phase1_header = MenuPanel(self, 'Find Your Account', 0.3, font='head')
+        self.phase1_sub = MenuPanel(self, 'Enter your username and secret phrase to continue', 0.43, font='sub')
+        self.reset_continue_btn = MenuPanel(self, 'Continue', 0.85, font='sub', color='head')
+        self.reset_continue_btn.button()
+        self.reset_continue_btn.button_rect.size = self.username_field.rect.size
+        self.reset_continue_btn.button_rect.center = self.reset_continue_btn.rect.center
+        self.secret_phrase_field = FormField(self, 'Secret phrase', 0.57)
+        self.phase2_header = MenuPanel(self, 'Reset Password', 0.3, font='head')
+        self.phase2_sub = MenuPanel(self, 'Your new password must be at least 6 characters', 0.43, font='sub')
+        self.new_password_field = FormField(self, 'New password', 0.45)
+        self.confirm_password_field = FormField(self, 'Confirm password', 0.57)
+        self.reset_confirm_btn = MenuPanel(self, 'Confirm', 0.85, font='sub', color='head')
+        self.reset_confirm_btn.button()
+        self.reset_confirm_btn.button_rect.size = self.new_password_field.rect.size
+        self.reset_confirm_btn.button_rect.center = self.reset_confirm_btn.rect.center  
+        self.phase3_header = MenuPanel(self, 'Password Reset Successful!', 0.35, font='head')
+        self.phase3_sub = MenuPanel(self, 'Your account password has been updated. Please log in.', 0.48, font='sub')
+        self.reset_to_login_btn = MenuPanel(self, 'Back to Login', 0.72, font='sub', color='head')
+        self.reset_to_login_btn.button()
+        self.reset_to_login_btn.button_rect.size = self.username_field.rect.size
+        self.reset_to_login_btn.button_rect.center = self.reset_to_login_btn.rect.center
+
+    def setup_acc_creation_entities(self):
+        # Header & Subtext
+        self.create_header = MenuPanel(self, 'Create An Account', 0.2, font='head')
+        self.create_sub = MenuPanel(self, 'Fill in your details to get started', 0.3, font='sub')
+        # The 4 Dedicated Registration Fields
+        self.reg_username_field = FormField(self, 'Username', 0.33)
+        self.reg_secret_field = FormField(self, 'Secret phrase (for recovery)', 0.45)
+        self.reg_password_field = FormField(self, 'Password (min. 6 chars)', 0.57)
+        self.reg_confirm_field = FormField(self, 'Confirm password', 0.69)
+        # Confirm / Submit Action Button
+        self.create_confirm_btn = MenuPanel(self, 'Create Account', 0.95, font='sub', color='head')
+        self.create_confirm_btn.button()
+        self.create_confirm_btn.button_rect.size = self.reg_username_field.rect.size
+        self.create_confirm_btn.button_rect.center = self.create_confirm_btn.rect.center
+
     def drop_down_texts(self):
         '''Customizing the dropdown texts that pop when select difiiculty is clicked'''
         # Getting the width and x postion of the main difficulty button.
@@ -153,6 +199,25 @@ class GeniusArcade:
             option.button_rect.width = drop_width
             option.button_rect.centerx = drop_x
             option.rect.center = option.button_rect.center
+
+    def go_back(self):
+        '''Automatically returns to the previous game state and cleans up state flags.'''
+        if self.game_state == 'reset':
+            self.show_reset_error = False
+            if self.reset_phase == 2:
+                # Step back from Phase 2 to Phase 1
+                self.reset_phase = 1
+                # Clear partially typed passwords
+                self.password_field.clear_text()
+                self.confirm_pass_field.clear_text()
+            elif self.reset_phase == 1:
+                # Exit the reset flow back to login
+                self.game_state = 'login'
+                self.username_field.clear_text()
+                self.secret_phrase_field.clear_text()
+        elif self.state_history:
+            # Changes present state to previous state
+            self.game_state = self.state_history.pop()
 
     def create_game_over_txt(self):
         self.game_over_txt = GameOver(self, 'Game Over!!!', 0.5, 'main')
@@ -220,16 +285,45 @@ class GeniusArcade:
                         # This ignores these keys so they don't print weird block characters
                         pass                
                     else:
-                        # event.unicode captures the actual character typed (including uppercase)
+                        # event.unicode captures the actual character typed (including uppercase or any character at all) to give 
+                        # users flexibility when crafting their credentials
                         self.username_field.update_text(new_character=event.unicode)
                         self.password_field.update_text(new_character=event.unicode)
-                
+                elif self.game_state == 'reset':
+                    if self.show_reset_error:
+                        self.show_reset_error = False
+                    if self.reset_phase == 1:
+                        if event.key == pygame.K_BACKSPACE:
+                            self.secret_phrase_field.update_text(delete=True)
+                            self.username_field.update_text(delete=True)
+                        elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_TAB):
+                            # This ignores these keys so they don't print weird block characters
+                            pass                
+                        else:
+                            # event.unicode captures the actual character typed (including uppercase)
+                            self.secret_phrase_field.update_text(new_character=event.unicode)
+                            self.username_field.update_text(new_character=event.unicode)
+                    elif self.reset_phase == 2:
+                        if event.key == pygame.K_BACKSPACE:
+                            self.new_password_field.update_text(delete=True)
+                            self.confirm_password_field.update_text(delete=True)
+                        elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER, pygame.K_TAB):
+                            # This ignores these keys so they don't print weird block characters
+                            pass     
+                        else:
+                            self.new_password_field.update_text(new_character=event.unicode)
+                            self.confirm_password_field.update_text(new_character=event.unicode)
+                elif self.game_state == 'create':
+                    pass
+# TODO: The create game state
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 if self.game_state != 'welcome':
                     if self.quit_game.button_rect.collidepoint(mouse_pos):
                         pygame.quit()
                         sys.exit()
+                    elif self.back_button.button_rect.collidepoint(mouse_pos):
+                        self.go_back()
                 else:
                     self.check_continue_bttn(mouse_pos)
                 if self.game_state == 'menu':
@@ -239,6 +333,83 @@ class GeniusArcade:
                     self.check_main_menu_bttn(mouse_pos)
                 elif self.game_state == 'login':
                     self.check_login_clicks(mouse_pos)
+                elif self.game_state == 'reset':
+                    self.check_reset_password_click(mouse_pos)
+                elif self.game_state == 'create':
+                    self.check_create_account_clicks(mouse_pos)
+
+    def trigger_reset_error(self, message, error_type='reset'):
+        '''Renders the error surface ONCE when a validation error occurs.'''
+        if error_type == 'create':
+            self.create_error_surface = self.settings.error_font.render(message, True, (255, 50, 50))
+            self.create_error_rect = self.create_error_surface.get_rect()
+            self.create_error_rect.bottomleft = (self.reg_username_field.rect.left, self.reg_username_field.rect.top - 5)
+            self.show_create_error = True
+        elif error_type == 'reset':
+            self.reset_error_surface = self.settings.error_font.render(message, True, (255, 50, 50))
+            self.reset_error_rect = self.reset_error_surface.get_rect()
+            self.reset_error_rect.bottomleft = (self.new_password_field.rect.left, self.new_password_field.rect.top - 5)
+            self.show_reset_error = True
+            
+    def check_reset_password_click(self, mouse_pos):
+        # Update field color when they are clicked
+        if self.reset_phase == 1:
+            self.secret_phrase_field.update_active_state(mouse_pos)
+            self.username_field.update_active_state(mouse_pos)
+            if self.reset_continue_btn.button_rect.collidepoint(mouse_pos):
+                # Grabbing the user typed text to be used for comparison
+                entered_user = self.username_field.input_text
+                entered_secret = self.secret_phrase_field.input_text
+                # Saving the current user, so every other details of the user synces automatically 
+                if self.data_manager.reset_password(entered_user, entered_secret):
+                    self.reset_target_user = entered_user
+                    self.reset_phase = 2
+                    self.show_reset_error = False
+                else:
+                    self.trigger_reset_error("Username is not found, try again!")
+        elif self.reset_phase == 2:
+            self.new_password_field.update_active_state(mouse_pos)
+            self.confirm_password_field.update_active_state(mouse_pos)
+            # Ensures a minimum password character length
+            if self.confirm_password_field.rect.collidepoint(mouse_pos):
+                if len(self.new_password_field.input_text) < 6:
+                    self.trigger_reset_error("Password must be at least 6 characters!")
+                else:
+                    self.show_reset_error = False
+            if self.reset_confirm_btn.button_rect.collidepoint(mouse_pos):
+                new_pass = self.new_password_field.input_text
+                confirm_pass = self.confirm_password_field.input_text
+                current_password = self.data_manager.users[self.reset_target_user]['password']
+                # Minimum length check
+                if len(new_pass) < 6:
+                    self.trigger_reset_error("Password must be at least 6 characters!")
+                # Old password re-use check
+                elif new_pass == current_password:
+                    self.trigger_reset_error("New password cannot be same as old password!")
+                # Confirmation match check
+                elif new_pass != confirm_pass:
+                    self.trigger_reset_error("Passwords do not match!")
+                # If conditions met successful upon clciking on the confirm button
+                else:
+                    self.data_manager.update_user_password(self.reset_target_user, new_pass)
+                    self.show_reset_error = False
+                    self.reset_phase = 3
+        elif self.reset_phase == 3:
+            if self.reset_to_login_btn.button_rect.collidepoint(mouse_pos):
+                self.game_state = 'login'
+                # Reset state flags incase of future visits.
+                self.reset_phase = 1
+                self.show_reset_error = False
+                self.reset_target_user = None
+                # Wipes all field completely
+                self.username_field.clear_text()
+                self.password_field.clear_text()
+                self.secret_phrase_field.clear_text()
+                self.new_password_field.clear_text()
+                self.confirm_password_field.clear_text()
+
+    def check_create_account_clicks(self, mouse_pos):
+        pass
 
     def check_login_clicks(self, mouse_pos):
         '''Helps confirm if a user has clicked a field and changes color in respect'''
@@ -265,9 +436,25 @@ class GeniusArcade:
 
                 # If it matches, there is a game state chnage.
                 self.game_state = 'welcome'
+                self.show_login_error = False
             else:
                 # This shows a failure pop up text, showing 'Invalid credentials' prompting the user to check the input text.
                 self.show_login_error = True
+        if self.reset_pass.rect.collidepoint(mouse_pos):
+            self.game_state = 'reset'
+            self.reset_phase = 1
+            # Clearing the field boxes freshly for next round of action.
+            self.username_field.clear_text()
+            self.password_field.clear_text()
+        if self.create_acc.button_rect.collidepoint(mouse_pos):
+            self.game_state = 'create'
+            self.create_phase = 1
+            self.show_create_error = False
+            # Wipe registration fields completely fresh
+            self.reg_username_field.clear_text()
+            self.reg_secret_field.clear_text()
+            self.reg_password_field.clear_text()
+            self.reg_confirm_field.clear_text()
 
     def check_dropdown_txts(self, mouse_pos):
         if self.opt_easy.button_rect.collidepoint(mouse_pos):
@@ -305,7 +492,6 @@ class GeniusArcade:
 
     def check_continue_bttn(self, mouse_pos):
         '''Responsible for switching game state from the welcome screen to the menu game state/screen'''
-        print('switch')
         if self.continue_btn.button_rect.collidepoint(mouse_pos):
             self.game_state = 'menu'
 
@@ -555,7 +741,6 @@ class GeniusArcade:
         self.screen.fill(self.settings.screen_bottom_color)
         self.screen.fill(self.settings.screen_top_color, self.top_bar_rect)
         self.select_diff.show_text()
-        self.how_to_play.show_text()
         self.score.show_text()
         self.high_score.show_text()
         self.game_round.show_text()
@@ -629,10 +814,10 @@ class GeniusArcade:
         self.password_field.draw()
         # Draws the error once the flag is True
         if self.show_login_error:
-            self.screen.blit(self.error_surface, self.error_rect)
+            self.screen.blit(self.login_error_surface, self.login_error_rect)
         self.login_btn.draw_button()
         self.login_btn.show_text()
-        self.reset_btn.show_text()
+        self.reset_pass.show_text()
         self.create_acc.draw_button()
         self.create_acc.show_text()
 
@@ -678,13 +863,50 @@ class GeniusArcade:
 # TODO
     def screen_update(self):
         '''Updates screen changes after each loop'''
-        if self.game_state != 'login':
+        if self.game_state not in ('login','reset','create'):
             self.background_color_fill()
         else:
             self.screen.fill(self.settings.screen_bottom_color)
+        if self.game_state == 'login':
             self.draw_login_texts()
-        self.quit_game.show_text()
-        if self.game_state == 'welcome':
+        elif self.game_state == 'create':
+            if self.show_create_error:
+                self.screen.blit(self.create_error_surface, self.create_error_rect)
+            # Regustration form
+            if self.create_phase == 1:
+                self.create_header.show_text()
+                self.create_sub.show_text()
+                self.reg_username_field.draw()
+                self.reg_secret_field.draw()
+                self.reg_password_field.draw()
+                self.reg_confirm_field.draw()
+                self.create_confirm_btn.draw_button()
+                self.create_confirm_btn.show_text()
+            elif self.create_phase == 2:
+                pass
+        elif self.game_state == 'reset':
+            if self.show_reset_error:
+                self.screen.blit(self.reset_error_surface, self.reset_error_rect)
+            if self.reset_phase == 1:
+                self.username_field.draw()
+                self.secret_phrase_field.draw()
+                self.phase1_header.show_text()
+                self.phase1_sub.show_text()
+                self.reset_continue_btn.draw_button()
+                self.reset_continue_btn.show_text()
+            elif self.reset_phase == 2:
+                self.phase2_header.show_text()
+                self.phase2_sub.show_text()
+                self.new_password_field.draw()
+                self.confirm_password_field.draw()
+                self.reset_confirm_btn.draw_button()
+                self.reset_confirm_btn.show_text()
+            elif self.reset_phase == 3:
+                self.phase3_header.show_text()
+                self.phase3_sub.show_text()
+                self.reset_to_login_btn.draw_button()
+                self.reset_to_login_btn.show_text()
+        elif self.game_state == 'welcome':
             self.draw_welcome_state()
         elif self.game_state == 'menu':
             self.draw_panel_txts()
@@ -709,6 +931,13 @@ class GeniusArcade:
             self.draw_countdown_timer()
         elif self.game_state == 'game_over':
             self.draw_game_over_txts()
+        self.quit_game.show_text()
+        if self.game_state == 'reset' and self.reset_phase == 3:
+            pass
+        elif self.game_state == 'create' and self.create_phase == 2:
+            pass
+        else:
+            self.back_button.show_text()
         pygame.display.flip()
 
 # To call the method to run the game without the code loosely placed.
