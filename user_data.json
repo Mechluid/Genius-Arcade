@@ -1,6 +1,23 @@
 {
     "Mechluid": {
-        "password": "YINDSGSSS",
-        "secret_phrase": "money"
+        "password": "bolaji123",
+        "secret_phrase": "money",
+        "easy_high_score": 0,
+        "medium_high_score": 250,
+        "hard_high_score": 4700
+    },
+    "Mechluide": {
+        "password": "minnesss",
+        "secret_phrase": "money",
+        "easy_high_score": 0,
+        "medium_high_score": 0,
+        "hard_high_score": 0
+    },
+    "aybanks": {
+        "password": "aybanks",
+        "secret_phrase": "aybanks",
+        "easy_high_score": 0,
+        "medium_high_score": 10500,
+        "hard_high_score": 0
     }
 }

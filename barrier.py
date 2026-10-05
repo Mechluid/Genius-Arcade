@@ -8,7 +8,6 @@ class Barrier(Sprite):
         self.screen = game_instance.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game_instance.settings
-        self.stats = game_instance.stats
         self.bar_width, self.bar_height = (game_instance.screen_width, 30)
         self.bar_x, self.bar_y = (0, self.screen_rect.centery - 300)
         self.rect = pygame.Rect(self.bar_x, self.bar_y, self.bar_width, self.bar_height)

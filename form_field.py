@@ -43,7 +43,7 @@ class FormField:
         self.text_rect.left = self.rect.left + 15 # Little gap for the placeholder text to start from
 
     def update_active_state(self, mouse_pos):
-        '''Checks if the mouse clicked inside this specific box.'''
+        '''Checks if the mouse clicked inside the specific field.'''
         if self.rect.collidepoint(mouse_pos):
             self.active = True
             self.current_color = self.color_active

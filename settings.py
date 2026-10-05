@@ -25,7 +25,7 @@ class Settings:
         self.bar_color = (0, 212, 175)
         self.bar_start_speed_easy = 0.2
         self.bar_start_speed_medium = 0.3
-        self.bar_start_speed_hard = 0.4
+        self.bar_start_speed_hard = 5
         self.speed_increase = 0.1 # 10% increase per round
 
         # Bar speed Factors
@@ -52,17 +52,6 @@ class Settings:
         self.panel_head_color = (255, 255, 255)
         self.panel_sub_color = (210, 215, 225)
         self.txt_delay_ms = 5000 # 5ms
-
-        # Game Over font setting
-        self.game_over_main = pygame.font.SysFont('trebuchetms', 90, bold= True)
-        self.game_over_sub = pygame.font.SysFont('trebuchetms', 50, bold= True)
-        self.game_over_label = pygame.font.SysFont('trebuchetms', 50, bold= True)
-        self.g_o_txt_color = (0, 0, 0)
-        self.g_o_button_color = (230, 230, 235)
-        self.game_over_font = {'main': self.game_over_main, 'sub': self.game_over_sub, 'label': self.game_over_label}
-        self.game_over_txt_color = {'main': self.text_color, 'sub' : self.text_color, 'label': self.g_o_txt_color}
-        self.game_over_bckg_color = {'main': self.panel_border_color, 'sub': self.panel_border_color, 'label': self.g_o_button_color}
-        self.g_o_txt_color = (0, 0, 0)
         
         # Font Panel Settings (Subset of Text)
         self.font_size = {'head' : self.panel_head_font, 'sub' : self.panel_sub_font, 'label': self.panel_label_font, 'intrct': self.panel_intrct_font}

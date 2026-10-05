@@ -2,13 +2,14 @@ import pygame
 
 class MenuPanel():
     '''Responsible for the game's menu panel texts and icons'''
-    def __init__(self, game_instance, message, offset_y, font, color = None): # type of text on panel
+    def __init__(self, game_instance, message, offset_y, font, color = None, offset_x=None): # type of text on panel
         self.screen = game_instance.screen
         self.settings = game_instance.settings
         self.panel = game_instance.menu_panel
         self.font_type = font
         self.color = color
         self.offset_y = offset_y
+        self.offset_x = offset_x
         self.message = message
         self.prep_menu_panel_txt()
 
@@ -18,14 +19,16 @@ class MenuPanel():
         if self.color:
             self.text_color = self.settings.font_color[self.color]
         else:
-            self.text_color = self.settings.font_color[self.font_type]                                             
+            self.text_color = self.settings.font_color[self.font_type] 
 
     def prep_menu_panel_txt(self):
         self.check_text_type()
-        self.image = self.font.render(self.message, True,
-                                                         self.text_color)
+        self.image = self.font.render(self.message, True, self.text_color)
         self.rect = self.image.get_rect()
-        self.rect.centerx = self.panel.centerx
+        if self.offset_x:
+            self.rect.centerx = self.screen.get_rect().width * self.offset_x
+        else:
+            self.rect.centerx = self.panel.centerx
         self.rect.y = self.offset_y * self.panel.height
 
     def update(self, message):

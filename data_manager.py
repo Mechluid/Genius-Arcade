@@ -11,7 +11,7 @@ class DataManager:
 
     def load_users(self):
         '''Helps read the stored user's information if it exists.'''
-        if self.filepath.exists():
+        if self.filepath.exists() and self.filepath.read_text().strip():
             return json.loads(self.filepath.read_text())
         return {}
 
@@ -28,7 +28,10 @@ class DataManager:
         # Add the new user to database setup
         self.users[username] = {
             'password': password,
-            'secret_phrase': secret_phrase # essential to reset user's passowrd
+            'secret_phrase': secret_phrase, # essential to reset user's passowrd
+            'easy_high_score': 0, # default user high_score
+            'medium_high_score' : 0,
+            'hard_high_score' : 0
         }
         # Saving the new user information to the database
         self.save_users()
@@ -52,12 +55,32 @@ class DataManager:
         # If the username doesn't exist, Or the password was wrong, it returns False
         return False # This brings a popup like "invalid credentials"
 
+    def get_high_score(self, username, difficulty):
+        '''Retrieves the high score for a specific user and difficulty.'''
+        if username in self.users:
+            score_key = f"{difficulty}_high_score"
+            return self.users[username].get(score_key, 0) # This prevents key error from python 
+        # incase the key needed isn't available, it returns 0 instead.
+        return 0
+
+    def update_high_score(self, username, difficulty, new_score):
+        '''Updates the high score for a user if the new score is higher.'''
+        if username in self.users:
+            score_key = f"{difficulty}_high_score"
+            current_high = self.users[username].get(score_key, 0)
+            if new_score > current_high:
+                self.users[username][score_key] = new_score
+                self.save_users()
+                return True
+        return False
+    
     def reset_password(self, username, secret_phrase):
         '''Reset the user password'''
         # Checks if the username exists
         if username in self.users:
             # Checks if the entered secret_phrase matches the stored secret_phrase
             if self.users[username]['secret_phrase'] == secret_phrase:
-                return True # Changes the screen that shows something about new password , then confirm password
+                return 'success' # Changes the screen that shows something about new password , then confirm password
+            return 'wrong_secret'
         # if username doesn't exist, or the secret phrase was wrong , it returns false
-        return False # This shows a pop up text that says "Invalid credantials"
+        return 'user_not_found' # This shows a pop up text that says "Invalid credantials"
