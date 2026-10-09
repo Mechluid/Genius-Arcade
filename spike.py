@@ -16,6 +16,7 @@ class Spike(Sprite):
         self.rect = pygame.Rect(self.x_coor, self.y_coor, self.width, self.settings.spike_height)
 
     def create_points(self):
+        '''Create respective point that forms the spike in-game'''
         self.points = [[self.x_coor + (self.width / 2), (self.y_coor)], # Spike TIp
                             [self.x_coor, self.screen_height], # Spike bottom left
                             [(self.x_coor + self.width), self.screen_height] # Spike bottom right

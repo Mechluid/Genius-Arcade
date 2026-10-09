@@ -7,11 +7,11 @@ from pathlib import Path
 class Ball(Sprite):
     """Initailize the ball's property and handles the motion"""
     def __init__(self, game_instance):
-        super().__init__()
+        super().__init__() # Allowing the use of the methods contained in the Sprite class
         self.screen = game_instance.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game_instance.settings
-        self.bars = game_instance.bars
+        self.bars = game_instance.bars # this to simulate how the balls interact with the bar during the game
         self.top_frame = game_instance.top_bar_rect
         self.get_ball_image()
         # Ball postioning and precise motioning
@@ -31,15 +31,15 @@ class Ball(Sprite):
 
     def ball_initial_parameters(self):
         self.dy = 0 # Velocity at rest in the y direction
-        self.dx = 0 # Velocity at rest in the x 
+        self.dx = 0 # Velocity at rest in the x direction
 
     def get_ball_image(self):
         '''Used to get the ball image to be displayed on the screen'''
-        image_path = Path(__file__).parent/ 'ball.bmp'
+        image_path = Path(__file__).parent/ 'ball.bmp' # to prevent crashing when python looks for the file to render
         self.ball_image = pygame.image.load(image_path)
         self.ball_diameter = 2 * self.settings.ball_radius # modifying the ball shape to better suit the game aesthetics
         self.scaled_ball_size = (self.ball_diameter, self.settings.ball_radius)
-        self.ball_scaled_image = pygame.transform.smoothscale(self.ball_image, self.scaled_ball_size)
+        self.ball_scaled_image = pygame.transform.smoothscale(self.ball_image, self.scaled_ball_size) # resize the ball to fit game aesthetic
         self.rect = self.ball_scaled_image.get_rect()
 
     def update(self):

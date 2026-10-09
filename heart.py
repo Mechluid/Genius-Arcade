@@ -14,7 +14,7 @@ class Heart(Sprite):
     def create_heart_image(self):
         image_path = Path(__file__).parent/ 'heart.bmp'
         self.image = pygame.image.load(image_path)
-        self.scaled_size = (50, self.top_menu_bar.height)
+        self.scaled_size = (50, self.top_menu_bar.height) # Resizing the image to fit game aesthetics
         self.scaled_image = pygame.transform.smoothscale(self.image, self.scaled_size)
         self.rect = self.scaled_image.get_rect()
 

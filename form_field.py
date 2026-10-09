@@ -6,15 +6,14 @@ class FormField:
         self.screen = game_instance.screen
         self.settings = game_instance.settings
         self.menu_panel = game_instance.menu_panel
-        self.placeholder = placeholder # The text entered by the user
-        self.y_ratio = y_ratio
+        self.placeholder = placeholder # The text int the form field by deafult, it remains till the user types
+        self.y_ratio = y_ratio # Helps with positioning of the form field
         self.input_text = ''  # Holds the actual characters the user types
         self.active = False # helps track if the field box is currently selected.
         
         # Text box dimensions
         self.width = game_instance.panel_w * 0.8  
         self.height = 55
-        self.rect = pygame.Rect(0, 0, self.width, self.height)
         self.create_field_box()
         self.prep_placholder_txt()
         # Colors for the field box interactive states - basically changes color when it is clicked on
@@ -36,7 +35,7 @@ class FormField:
             text_color = (255, 255, 255)
         else:
             display_str = self.placeholder # Solid white for typed text
-            text_color = (150, 150, 150) # Dim grey for placeholder
+            text_color = (150, 150, 150) # Dim grey for placeholder txt
         self.text_surface = self.font.render(display_str, True, text_color)
         self.text_rect = self.text_surface.get_rect()
         self.text_rect.centery = self.rect.centery

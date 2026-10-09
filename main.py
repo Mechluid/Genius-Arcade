@@ -45,7 +45,6 @@ class GeniusArcade:
         self.create_bar()
         self.create_hearts()
         self.create_game_over_txt()
-        self.active_user = None
 
     def initialize_window_properties(self):
         self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
@@ -54,17 +53,20 @@ class GeniusArcade:
         self.clock = pygame.time.Clock()
 
     def important_game_flags(self):
-        self.game_state = 'login'
+        '''Every important flag that helps with state management'''
+        self.game_state = 'login' # Default game state
         self.start_game = False # Tracks if the game is started (When the gameplay begins)
         self.dropdown_open = False # Tracks if the difficulty list is visible
         self.current_difficulty = 'medium' # Default state difficulty
         self.show_login_error = False # Prompts the user if credentials are invalid
         self.show_reset_error = False 
+        self.show_create_error = False
         # Tracks navigation history for automatic back navigation
         self.state_history = []
         self.reset_phase = 1
         self.create_phase = 1
-        self.show_create_error = False
+        self.active_user = None # To acertain if there is user currently logged in
+        self.is_new_user = False
 
     def game_entities(self):
         self.bars = pygame.sprite.Group()
@@ -77,8 +79,10 @@ class GeniusArcade:
     def game_time_props(self):
         self.last_update_time = pygame.time.get_ticks()
         self.qn_update_time = pygame.time.get_ticks()
+        self.current_time = pygame.time.get_ticks()
 
     def create_panel_attribute(self):
+        '''Setting up the game's panel foundation'''
         self.panel_w = self.screen_width * self.settings.panel_width_ratio 
         self.panel_h = self.screen_height // 2 
         self.menu_panel = pygame.Rect(0, 0, self.panel_w, self.panel_h)
@@ -86,6 +90,7 @@ class GeniusArcade:
         self.menu_panel.top = self.top_bar_rect.bottom
 
     def create_hearts(self):
+        '''Crates 'heart' game entity that depicts the chnaces a user have in-game'''
         for index in range(self.stats.heart_num):
             heart = Heart(self)
             heart.rect.x = self.heart_level.button_rect.right + (index * heart.rect.width)
@@ -180,7 +185,7 @@ class GeniusArcade:
         self.create_to_login_btn.button()
         self.create_to_login_btn.button_rect.size = self.reg_username_field.rect.size
         self.create_to_login_btn.button_rect.center = self.create_to_login_btn.rect.center
-#TODO: Work on the pasuse sub caption.
+
     def setup_pause_entities(self):
         # Header & Subtext
         self.pause_header = MenuPanel(self, 'Game Paused', 0.25, font='head')
@@ -305,88 +310,23 @@ class GeniusArcade:
                     pygame.quit()
                     sys.exit()
                 elif self.game_state == 'playing':
-                    if event.unicode.isdigit():
-                        pressed_num = str(event.unicode)
-                        self.handling_input_element(pressed_num)
-                    elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                        self.check_answer()
-                        self.finish_game_round()
-                    elif event.key == pygame.K_BACKSPACE:
-                        if self.input_elements:
-                            for input_element in self.input_elements:
-                                input_element.remove_text()
-                    elif event.key == pygame.K_ESCAPE:
-                        self.screen_veil()
-                        self.game_state = 'pause'
+                    self.keydown_play_state_event(event)
                 elif self.game_state == 'login':
                     # This clears the error message once the keyboard makes an edit
                     if self.show_login_error:
                         self.show_login_error = False
-                    if event.key == pygame.K_BACKSPACE:
-                        # It send the delete command to both fields, of which can be executed if "active"
-                        self.username_field.update_text(delete=True)
-                        self.password_field.update_text(delete=True)
-                    elif event.key == pygame.K_TAB:
-                        # This ignores these keys so they don't print weird block characters
-                        pass       
-                    elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
-                        self.evaluate_login_entry()
-                    else:
-                        # event.unicode captures the actual character typed (including uppercase or any character at all) to give 
-                        # users flexibility when crafting their credentials
-                        self.username_field.update_text(new_character=event.unicode)
-                        self.password_field.update_text(new_character=event.unicode)
+                    self.keydown_login_state_event(event)
                 elif self.game_state == 'welcome':
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         self.game_state = 'menu'
                 elif self.game_state == 'reset':
                     if self.show_reset_error:
                         self.show_reset_error = False
-                    if self.reset_phase == 1:
-                        if event.key == pygame.K_BACKSPACE:
-                            self.secret_phrase_field.update_text(delete=True)
-                            self.username_field.update_text(delete=True)
-                        elif event.key == pygame.K_TAB:
-                            # This ignores these keys so they don't print weird block characters
-                            pass  
-                        elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
-                            self.evaluate_reset_phase1_entry()              
-                        else:
-                            # event.unicode captures the actual character typed (including uppercase)
-                            self.secret_phrase_field.update_text(new_character=event.unicode)
-                            self.username_field.update_text(new_character=event.unicode)
-                    elif self.reset_phase == 2:
-                        if event.key == pygame.K_BACKSPACE:
-                            self.new_password_field.update_text(delete=True)
-                            self.confirm_password_field.update_text(delete=True)
-                        elif event.key == pygame.K_TAB:
-                            # This ignores these keys so they don't print weird block characters
-                            pass 
-                        elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
-                            self.evaluate_reset_phase2_entry()  
-                        else:
-                            self.new_password_field.update_text(new_character=event.unicode)
-                            self.confirm_password_field.update_text(new_character=event.unicode)
+                    self.keydown_reset_state_event(event)
                 elif self.game_state == 'create':
                     if self.show_create_error:
                         self.show_create_error = False
-                    if self.create_phase == 1:
-                        if event.key == pygame.K_BACKSPACE:
-                            self.reg_username_field.update_text(delete=True)
-                            self.reg_secret_field.update_text(delete=True)
-                            self.reg_password_field.update_text(delete=True)
-                            self.reg_confirm_field.update_text(delete=True)
-                        elif event.key == pygame.K_TAB:
-                            # This ignores these keys so they don't print weird block characters
-                            pass           
-                        elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
-                            self.evaluate_create_phase1_entry()     
-                        else:
-                            # event.unicode captures the actual character typed (including uppercase)
-                            self.reg_username_field.update_text(new_character=event.unicode)
-                            self.reg_secret_field.update_text(new_character=event.unicode)
-                            self.reg_password_field.update_text(new_character=event.unicode)
-                            self.reg_confirm_field.update_text(new_character=event.unicode)
+                    self.keydown_create_state_event(event)
                 elif self.game_state == 'pause':
                     if event.key == pygame.K_ESCAPE:
                         self.game_state = 'playing'
@@ -416,20 +356,102 @@ class GeniusArcade:
                         self.game_state = 'pause'
                 elif self.game_state == 'pause':
                      self.check_paused_clicks(mouse_pos)
+
+    def keydown_play_state_event(self, event):
+        '''Check keydown events during 'playing' game state'''
+        if event.unicode.isdigit():
+            pressed_num = str(event.unicode)
+            self.handling_input_element(pressed_num)
+        elif event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+            self.check_answer()
+            self.finish_game_round()
+        elif event.key == pygame.K_BACKSPACE:
+            if self.input_elements:
+                for input_element in self.input_elements:
+                    input_element.remove_text()
+        elif event.key == pygame.K_ESCAPE:
+            self.screen_veil() 
+            self.game_state = 'pause'
+
+    def keydown_login_state_event(self, event):
+        '''Check keydown events during 'login' game state'''
+        if event.key == pygame.K_BACKSPACE:
+            # It send the delete command to both fields, of which can be executed if "active"
+            self.username_field.update_text(delete=True)
+            self.password_field.update_text(delete=True)
+        elif event.key == pygame.K_TAB:
+            # This ignores these keys so they don't print weird block characters
+            pass       
+        elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
+            self.evaluate_login_entry()
+        else:
+            # event.unicode captures the actual character typed (including uppercase or any character at all) to give 
+            # users flexibility when crafting their credentials
+            self.username_field.update_text(new_character=event.unicode)
+            self.password_field.update_text(new_character=event.unicode)
+
+    def keydown_reset_state_event(self, event):
+        '''Check keydown events during 'reset' game state'''
+        if self.reset_phase == 1:
+            if event.key == pygame.K_BACKSPACE:
+                self.secret_phrase_field.update_text(delete=True)
+                self.username_field.update_text(delete=True)
+            elif event.key == pygame.K_TAB:
+                # This ignores these keys so they don't print weird block characters
+                pass  
+            elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
+                self.evaluate_reset_phase1_entry()              
+            else:
+                # event.unicode captures the actual character typed (including uppercase)
+                self.secret_phrase_field.update_text(new_character=event.unicode)
+                self.username_field.update_text(new_character=event.unicode)
+        elif self.reset_phase == 2:
+            if event.key == pygame.K_BACKSPACE:
+                self.new_password_field.update_text(delete=True)
+                self.confirm_password_field.update_text(delete=True)
+            elif event.key == pygame.K_TAB:
+                # This ignores these keys so they don't print weird block characters
+                pass 
+            elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
+                self.evaluate_reset_phase2_entry()  
+            else:
+                self.new_password_field.update_text(new_character=event.unicode)
+                self.confirm_password_field.update_text(new_character=event.unicode)
+
+    def keydown_create_state_event(self, event):
+        '''Check keydown events during 'create' game state'''
+        if self.create_phase == 1:
+            if event.key == pygame.K_BACKSPACE:
+                self.reg_username_field.update_text(delete=True)
+                self.reg_secret_field.update_text(delete=True)
+                self.reg_password_field.update_text(delete=True)
+                self.reg_confirm_field.update_text(delete=True)
+            elif event.key == pygame.K_TAB:
+                # This ignores these keys so they don't print weird block characters
+                pass           
+            elif event.key in (pygame.K_KP_ENTER, pygame.K_RETURN):
+                self.evaluate_create_phase1_entry()     
+            else:
+                # event.unicode captures the actual character typed (including uppercase)
+                self.reg_username_field.update_text(new_character=event.unicode)
+                self.reg_secret_field.update_text(new_character=event.unicode)
+                self.reg_password_field.update_text(new_character=event.unicode)
+                self.reg_confirm_field.update_text(new_character=event.unicode)
                         
     def screen_veil(self):
-            snapshot = self.screen.copy()
-            tiny = pygame.transform.smoothscale(snapshot, (self.screen_width // 10, self.screen_height // 10))
-            blurred = pygame.transform.smoothscale(tiny, (self.screen_width, self.screen_height))
-            # Create the dark tint overlay (SRCALPHA enables transparency)
-            dark_tint = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
-            dark_tint.fill((0, 0, 0, 160))  # Potrays about 60% black tint
-            # THis is to Stamp the dark tint onto the blurred snapshot
-            blurred.blit(dark_tint, (0, 0))
-            self.blurred_background = blurred
+        '''More like a tint that covers the screen'''
+        snapshot = self.screen.copy()
+        tiny = pygame.transform.smoothscale(snapshot, (self.screen_width // 10, self.screen_height // 10))
+        blurred = pygame.transform.smoothscale(tiny, (self.screen_width, self.screen_height))
+        # Creates the dark tint overlay (SRCALPHA enables transparency)
+        dark_tint = pygame.Surface((self.screen_width, self.screen_height), pygame.SRCALPHA)
+        dark_tint.fill((0, 0, 0, 160))  # Potrays about 60% black tint
+        # THis is to Stamp the dark tint onto the blurred snapshot
+        blurred.blit(dark_tint, (0, 0))
+        self.blurred_background = blurred
 
     def trigger_error(self, message, error_type='reset'):
-        '''Renders the error surface ONCE when a validation error occurs.'''
+        '''Renders the error surface once when a validation error occurs.'''
         if error_type == 'create':
             self.create_error_surface = self.settings.error_font.render(message, True, (255, 50, 50))
             self.create_error_rect = self.create_error_surface.get_rect()
@@ -447,6 +469,7 @@ class GeniusArcade:
             self.show_login_error = True
 
     def check_reset_password_click(self, mouse_pos):
+        '''Registers and handles every clicks during the 'reset' game state'''
         # Update field color when they are clicked
         if self.reset_phase == 1:
             self.secret_phrase_field.update_active_state(mouse_pos)
@@ -514,6 +537,7 @@ class GeniusArcade:
             self.reset_phase = 3
 
     def check_create_account_clicks(self, mouse_pos):
+        '''Registers and handles every clicks during the 'create' game state'''
         if self.create_phase == 1:
             self.reg_username_field.update_active_state(mouse_pos)
             self.reg_secret_field.update_active_state(mouse_pos)
@@ -558,7 +582,7 @@ class GeniusArcade:
             self.create_phase = 2
 
     def check_login_clicks(self, mouse_pos):
-        '''Helps confirm if a user has clicked a field and changes color in respect'''
+        '''Helps confirm if a user has clicked a field and changes color in respect in 'login' state'''
         self.username_field.update_active_state(mouse_pos)
         self.password_field.update_active_state(mouse_pos)
         if self.login_btn.button_rect.collidepoint(mouse_pos):
@@ -594,16 +618,15 @@ class GeniusArcade:
             self.continue_btn.button()
             self.continue_btn.button_rect.bottomright = (self.screen_width - 30, self.screen_height - 30)
             self.continue_btn.rect.center = self.continue_btn.button_rect.center
-
+            # To confirm if the current user has an history.
+            scores = [self.data_manager.get_high_score(self.active_user, mode) for mode in ("easy", "medium", "hard")]
+            self.is_new_user = (sum(scores) == 0)
             # If it matches, there is a game state chnage.
             self.game_state = 'welcome'
             self.show_login_error = False
         else:
             # This shows a failure pop up text, showing 'Invalid credentials' prompting the user to check the input text.
             self.trigger_error("Invalid login credentials.", error_type='login')
-        # To confirm if the current user has an history.
-        scores = [self.data_manager.get_high_score(self.active_user, mode) for mode in ("easy", "medium", "hard")]
-        self.is_new_user = (sum(scores) == 0)
 
     def check_paused_clicks(self, mouse_pos):
         # When paused:
@@ -690,6 +713,7 @@ class GeniusArcade:
         self.high_score.update(h_score_msg)
         
     def ball_removal(self):
+        '''Handles the popping of the ball when questions are answered correctly or a ball touches a spike'''
         for ball in self.balls.sprites():
             ball.kill()
             self.update_ball_onscreen()
@@ -1057,6 +1081,67 @@ class GeniusArcade:
         self.screen.blit(self.blurred_background, (0, 0))
         self.draw_pause_menu()
 
+    def draw_create_state(self):
+        if self.show_create_error:
+            self.screen.blit(self.create_error_surface, self.create_error_rect)
+        # Registration form
+        if self.create_phase == 1:
+            self.create_header.show_text()
+            self.create_sub.show_text()
+            self.reg_username_field.draw()
+            self.reg_secret_field.draw()
+            self.reg_password_field.draw()
+            self.reg_confirm_field.draw()
+            self.create_confirm_btn.draw_button()
+            self.create_confirm_btn.show_text()
+        elif self.create_phase == 2:
+            self.create_success_header.show_text()
+            self.create_success_sub.show_text()
+            self.create_to_login_btn.draw_button()
+            self.create_to_login_btn.show_text()
+
+    def draw_reset_state(self):
+        if self.show_reset_error:
+            self.screen.blit(self.reset_error_surface, self.reset_error_rect)
+        if self.reset_phase == 1:
+            self.username_field.draw()
+            self.secret_phrase_field.draw()
+            self.phase1_header.show_text()
+            self.phase1_sub.show_text()
+            self.reset_continue_btn.draw_button()
+            self.reset_continue_btn.show_text()
+        elif self.reset_phase == 2:
+            self.phase2_header.show_text()
+            self.phase2_sub.show_text()
+            self.new_password_field.draw()
+            self.confirm_password_field.draw()
+            self.reset_confirm_btn.draw_button()
+            self.reset_confirm_btn.show_text()
+        elif self.reset_phase == 3:
+            self.phase3_header.show_text()
+            self.phase3_sub.show_text()
+            self.reset_to_login_btn.draw_button()
+            self.reset_to_login_btn.show_text()
+
+    def draw_menu_state(self):
+        self.draw_panel_txts()
+        # DROPDOWN TEXTS
+        if self.dropdown_open:
+            dropdown_height = self.opt_hard.button_rect.bottom - self.opt_easy.button_rect.top
+            # A solid color for the ddifficulty buttons to stay on.
+            dropdown_bg = pygame.Rect(
+                self.opt_easy.button_rect.left, 
+                self.opt_easy.button_rect.top, 
+                self.opt_easy.button_rect.width, 
+                dropdown_height
+            ) # Drawing the background rectangle , pygame.rect(x,y,width, height)
+            pygame.draw.rect(self.screen, self.settings.panel_color, dropdown_bg)
+            button_border = self.settings.panel_border_color
+            for option in [self.opt_easy, self.opt_med, self.opt_hard]:
+                option.draw_button(self.settings.panel_color)
+                pygame.draw.rect(self.screen, button_border, option.button_rect, width=2, border_radius=8)
+                option.show_text()     
+
     def screen_update(self):
         '''Updates screen changes after each loop'''
         if self.game_state not in ('login','reset','create'):
@@ -1069,65 +1154,13 @@ class GeniusArcade:
                 self.screen.blit(self.login_error_surface, self.login_error_rect)
             self.draw_login_texts()
         elif self.game_state == 'create':
-            if self.show_create_error:
-                self.screen.blit(self.create_error_surface, self.create_error_rect)
-            # Regustration form
-            if self.create_phase == 1:
-                self.create_header.show_text()
-                self.create_sub.show_text()
-                self.reg_username_field.draw()
-                self.reg_secret_field.draw()
-                self.reg_password_field.draw()
-                self.reg_confirm_field.draw()
-                self.create_confirm_btn.draw_button()
-                self.create_confirm_btn.show_text()
-            elif self.create_phase == 2:
-                self.create_success_header.show_text()
-                self.create_success_sub.show_text()
-                self.create_to_login_btn.draw_button()
-                self.create_to_login_btn.show_text()
+            self.draw_create_state()
         elif self.game_state == 'reset':
-            if self.show_reset_error:
-                self.screen.blit(self.reset_error_surface, self.reset_error_rect)
-            if self.reset_phase == 1:
-                self.username_field.draw()
-                self.secret_phrase_field.draw()
-                self.phase1_header.show_text()
-                self.phase1_sub.show_text()
-                self.reset_continue_btn.draw_button()
-                self.reset_continue_btn.show_text()
-            elif self.reset_phase == 2:
-                self.phase2_header.show_text()
-                self.phase2_sub.show_text()
-                self.new_password_field.draw()
-                self.confirm_password_field.draw()
-                self.reset_confirm_btn.draw_button()
-                self.reset_confirm_btn.show_text()
-            elif self.reset_phase == 3:
-                self.phase3_header.show_text()
-                self.phase3_sub.show_text()
-                self.reset_to_login_btn.draw_button()
-                self.reset_to_login_btn.show_text()
+            self.draw_reset_state()
         elif self.game_state == 'welcome':
             self.draw_welcome_state()
         elif self.game_state == 'menu':
-            self.draw_panel_txts()
-            # DROPDOWN TEXTS
-            if self.dropdown_open:
-                dropdown_height = self.opt_hard.button_rect.bottom - self.opt_easy.button_rect.top
-                # A solid color for the ddifficulty buttons to stay on.
-                dropdown_bg = pygame.Rect(
-                    self.opt_easy.button_rect.left, 
-                    self.opt_easy.button_rect.top, 
-                    self.opt_easy.button_rect.width, 
-                    dropdown_height
-                ) # Drawing the background rectangle , pygame.rect(x,y,width, height)
-                pygame.draw.rect(self.screen, self.settings.panel_color, dropdown_bg)
-                button_border = self.settings.panel_border_color
-                for option in [self.opt_easy, self.opt_med, self.opt_hard]:
-                    option.draw_button(self.settings.panel_color)
-                    pygame.draw.rect(self.screen, button_border, option.button_rect, width=2, border_radius=8)
-                    option.show_text()     
+            self.draw_menu_state()
         elif self.game_state == 'playing':
             self.pause_button.show_text()
             self.draw_game_entities()

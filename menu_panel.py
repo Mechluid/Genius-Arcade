@@ -22,6 +22,7 @@ class MenuPanel():
             self.text_color = self.settings.font_color[self.font_type] 
 
     def prep_menu_panel_txt(self):
+        '''Handles the string conversion and their positioning'''
         self.check_text_type()
         self.image = self.font.render(self.message, True, self.text_color)
         self.rect = self.image.get_rect()

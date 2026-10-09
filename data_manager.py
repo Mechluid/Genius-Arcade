@@ -16,7 +16,7 @@ class DataManager:
         return {}
 
     def save_users(self):
-        '''Saves the updated user information back to the database''' # TO call it each time game ends or gameover to save user progress
+        '''Saves the updated user information back to the database''' 
         json_string = json.dumps(self.users, indent=4)
         self.filepath.write_text(json_string)
 
@@ -35,7 +35,7 @@ class DataManager:
         }
         # Saving the new user information to the database
         self.save_users()
-        return True # This to help with my pop up , once true, "Use profile created successfully"
+        return True
 
     def update_user_password(self, username, new_password):
         '''Updates the user password and saves to the database.'''
@@ -80,7 +80,6 @@ class DataManager:
         if username in self.users:
             # Checks if the entered secret_phrase matches the stored secret_phrase
             if self.users[username]['secret_phrase'] == secret_phrase:
-                return 'success' # Changes the screen that shows something about new password , then confirm password
-            return 'wrong_secret'
-        # if username doesn't exist, or the secret phrase was wrong , it returns false
-        return 'user_not_found' # This shows a pop up text that says "Invalid credantials"
+                return 'success' # Take the user to the reset password screen
+            return 'wrong_secret' # Prompt the user an error stating the secret entered is not correct.
+        return 'user_not_found' # This shows a pop up text that says 'User dosen't exist'

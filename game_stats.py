@@ -7,6 +7,7 @@ class GameStats:
         self.reset_stats()
 
     def reset_stats(self):
+        '''reset the paramters to their default values'''
         self.game_round = 1
         self.score = 0
         self.heart_num = 3

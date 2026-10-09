@@ -14,6 +14,7 @@ class MenuBar:
         self.button()
 
     def prep_menu_bar_text(self):
+        '''Builds the image to be rendered on the screen and handles it positioning'''
         self.image = self.settings.bar_txt_font.render(self.message.title(), True, 
                                                     self.settings.text_color)
         self.rect = self.image.get_rect()

@@ -5,7 +5,7 @@ class InputBox(Sprite):
     def __init__(self, input, question, game_instance):
         super().__init__()
         self.screen = game_instance.screen
-        self.input = f'{input}'
+        self.input = str(input) # converts user inputs to string data type to render as image in-game
         self.settings = game_instance.settings
         self.question = question
         self.prep_input()

@@ -4,62 +4,6 @@
         "secret_phrase": "money",
         "easy_high_score": 0,
         "medium_high_score": 250,
-        "hard_high_score": 4700
-    },
-    "Mechluide": {
-        "password": "minnesss",
-        "secret_phrase": "money",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "aybanks": {
-        "password": "aybanks",
-        "secret_phrase": "aybanks",
-        "easy_high_score": 0,
-        "medium_high_score": 10500,
-        "hard_high_score": 0
-    },
-    "Bolaji": {
-        "password": "minders",
-        "secret_phrase": "bolahi",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "gbolahan": {
-        "password": "gbolahan",
-        "secret_phrase": "gbolahan",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "Mimies": {
-        "password": "mimies",
-        "secret_phrase": "mimies",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "Samuel": {
-        "password": "samuel",
-        "secret_phrase": "samuel",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "Israel": {
-        "password": "israel",
-        "secret_phrase": "israel",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
-        "hard_high_score": 0
-    },
-    "Hinged": {
-        "password": "hinged",
-        "secret_phrase": "hinged",
-        "easy_high_score": 0,
-        "medium_high_score": 0,
         "hard_high_score": 0
     }
 }

@@ -14,6 +14,7 @@ class Barrier(Sprite):
         self.y = float(self.rect.y)
 
     def update(self, current_bar_speed):
+        '''Handles the bar motion in-game'''
         self.y += current_bar_speed
         self.rect.y = self.y
 

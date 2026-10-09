@@ -1,4 +1,3 @@
-import pygame
 import random
 from pygame.sprite import Sprite
 from math import prod
@@ -12,7 +11,7 @@ class Question(Sprite):
         self.screen = game_instance.screen
         self.screen_rect = self.screen.get_rect()
         self.settings = game_instance.settings
-        self.fixed_pos = self.screen_rect.height - self.settings.qn_distance
+        self.fixed_pos = self.screen_rect.height - self.settings.qn_distance # The position threshold of the question during movement
         self.pick_random_operator()
         self.generate_random_num(min_number, max_number)
         self.operation = {'+': lambda a, b: a + b,
@@ -25,8 +24,8 @@ class Question(Sprite):
         self.generate_answers()
     
     def pick_random_operator(self):
-        '''Picks an operator to be displayed randomly'''
-        self.operators = ['+', '-', 'x', '/'] # Planning to remove the divisor soon and add it in later rounds
+        '''Picks an operator to be displayed and be used for operation randomly'''
+        self.operators = ['+', '-', 'x', '/'] 
         self.chosen_operator = random.choice(self.operators)
 
     def generate_random_num(self, min_number, max_number):
@@ -51,6 +50,7 @@ class Question(Sprite):
         self.rect.x =  self.screen_rect.centerx - (self.rect.width / 2)
 
     def create_equation(self):
+        '''Create question to be answered by the current player'''
         self.message = f'Question: {self.a} {self.chosen_operator} {self.b} ________'
 
     def generate_answers(self):

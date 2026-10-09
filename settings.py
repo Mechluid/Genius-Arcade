@@ -5,7 +5,7 @@ class Settings:
     def __init__(self):
         '''handles the variables to alter/change the behavior of the game'''
         # Screen
-        self.frame = 60
+        self.frame = 60 # Game's frame rate
         self.screen_bottom_color = (30, 34, 42) # Background bottom color 
         self.screen_top_color = (40, 44, 54) # Background top color
         self.panel_width_ratio = 0.4
