@@ -25,7 +25,7 @@ class Settings:
         self.bar_color = (0, 212, 175)
         self.bar_start_speed_easy = 0.2
         self.bar_start_speed_medium = 0.3
-        self.bar_start_speed_hard = 5
+        self.bar_start_speed_hard = 0.4
         self.speed_increase = 0.1 # 10% increase per round
 
         # Bar speed Factors

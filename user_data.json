@@ -19,5 +19,12 @@
         "easy_high_score": 0,
         "medium_high_score": 10500,
         "hard_high_score": 0
+    },
+    "Bolaji": {
+        "password": "minders",
+        "secret_phrase": "bolahi",
+        "easy_high_score": 0,
+        "medium_high_score": 0,
+        "hard_high_score": 0
     }
 }

@@ -2,13 +2,14 @@ import pygame
 
 class MenuBar:
     '''Handles the icons and texts displayed on the game's menu bar'''
-    def __init__(self, game_instance, message, offset_x=40, text_spacing=60):
+    def __init__(self, game_instance, message, offset_x=40, text_spacing=80, allign_right = False):
         self.screen = game_instance.screen
         self.settings = game_instance.settings
         self.top_menu_bar = game_instance.top_bar_rect
         self.message = message
         self.offset_x = offset_x
         self.text_spacing = text_spacing
+        self.allign_right = allign_right
         self.prep_menu_bar_text()
         self.button()
 
@@ -16,7 +17,10 @@ class MenuBar:
         self.image = self.settings.bar_txt_font.render(self.message.title(), True, 
                                                     self.settings.text_color)
         self.rect = self.image.get_rect()
-        self.rect.x = self.offset_x + self.text_spacing
+        if self.allign_right:
+            self.rect.right = self.top_menu_bar.right - self.text_spacing
+        else:
+            self.rect.x = self.offset_x + self.text_spacing
         self.rect.centery = self.top_menu_bar.centery
 
     def button(self):

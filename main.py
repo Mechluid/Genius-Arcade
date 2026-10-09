@@ -93,15 +93,15 @@ class GeniusArcade:
 
     def setup_menu_bar_text(self):
         display = '--:--'
-        self.back_button = MenuBar(self, 'Back', 0, text_spacing=20)
+        self.back_button = MenuBar(self, 'Back', 0, text_spacing=30)
+        self.quit_game = MenuBar(self, f'Quit', text_spacing=30, allign_right=True)
+        self.pause_button = MenuBar(self, 'Pause', text_spacing=30, allign_right=True)
         self.select_diff = MenuBar(self, f'Difficulty: {display}', self.back_button.rect.right)
         self.score = MenuBar(self, f'Score: {display}', self.select_diff.rect.right)
         self.high_score = MenuBar(self, f'High Score: {display}', self.score.rect.right)
         self.game_round = MenuBar(self, f'round: {display}', self.high_score.rect.right)
         self.remaining_balls = MenuBar(self, f'Balls: {display}', self.game_round.rect.right)
         self.heart_level = MenuBar(self, f'hearts:', self.remaining_balls.rect.right)
-        self.quit_game = MenuBar(self, f'Quit', self.heart_level.rect.right, text_spacing=200)
-        self.pause_button = MenuBar(self, 'Pause', self.heart_level.rect.right, text_spacing=200)
 
     def setup_menu_panel_txt(self):
         header_txt = 'Test Your Maths Knowledge'
@@ -992,12 +992,12 @@ class GeniusArcade:
         self.screen.blit(sub_surf, sub_rect)
         # Drawing player last saved stats on the welcome back screen.
         modes = ["easy", "medium", "hard"]
-        x_positions = [self.screen_width // 4, self.screen_width // 2, (self.screen_width * 3 // 4)]
+        x_positions = [self.screen_width // 5, self.screen_width // 2, (self.screen_width * 4 // 5)]
         base_y = self.screen_height // 2 + 20
         for i, mode in enumerate(modes):
             # Draws the mode title, putting the stats in its column
             mode_surf = self.settings.stats_font.render(mode.title(), True, (200, 200, 200)) # Slightly dimmed color
-            mode_rect = mode_surf.get_rect(center=(x_positions[i], base_y))
+            mode_rect = mode_surf.get_rect(center=(x_positions[i], base_y)) 
             self.screen.blit(mode_surf, mode_rect)
             
             # Draw Highest Score for the mode column
