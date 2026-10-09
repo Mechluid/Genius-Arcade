@@ -601,6 +601,9 @@ class GeniusArcade:
         else:
             # This shows a failure pop up text, showing 'Invalid credentials' prompting the user to check the input text.
             self.trigger_error("Invalid login credentials.", error_type='login')
+        # To confirm if the current user has an history.
+        scores = [self.data_manager.get_high_score(self.active_user, mode) for mode in ("easy", "medium", "hard")]
+        self.is_new_user = (sum(scores) == 0)
 
     def check_paused_clicks(self, mouse_pos):
         # When paused:
@@ -1005,10 +1008,41 @@ class GeniusArcade:
             score_rect = score_surf.get_rect(center=(x_positions[i], base_y + 80))
             self.screen.blit(score_surf, score_rect)
 
+    def how_to_play_dashboard(self):
+        # Title
+        title_surf = self.settings.welcome_txt_font.render("HOW TO PLAY", True, self.settings.count_down_font_color)
+        title_rect = title_surf.get_rect(center=(self.screen_width // 2, self.screen_height // 4 - 20))
+        self.screen.blit(title_surf, title_rect)
+
+        # The rules governing the game.
+        rules = [
+        "- solve the math equation shown at the bottom",
+        "- type your answer using number keys [ 0 - 9 ]",
+        "- press [ ENTER ] to submit and pop trapped balls",
+        "- don't let balls fall into the moving spikes",
+        "- survive with your 3 hearts and beat your high score"
+        ]
+        start_y = self.screen_height // 4 + 70
+        line_spacing = 55
+        # Drawing them on the screen just under the titled message.
+        for i, rule in enumerate(rules):
+            rule_surf = self.settings.stats_font.render(rule, True, (220, 230, 245))
+            rule_rect = rule_surf.get_rect(center=(self.screen_width // 2, start_y + (i * line_spacing)))
+            self.screen.blit(rule_surf, rule_rect)
+        # Setting the control button guide just at the bottom
+        controls_txt = "[ 0 - 9 ] Type Answer   |   [ ENTER ] Submit   |   [ P / ESC ] Pause"
+        controls_surf = self.settings.bar_txt_font.render(controls_txt, True, (0, 212, 175))
+        controls_rect = controls_surf.get_rect(center=(self.screen_width // 2, start_y + (len(rules) * line_spacing) + 40))
+        self.screen.blit(controls_surf, controls_rect)
+
+
     def draw_welcome_state(self):
-         # Draws the blurred background
+         # Draws the blurred background over the interface
         self.screen.blit(self.blurred_background, (0, 0))
-        self.draw_welcome_dashboard()
+        if self.is_new_user:
+            self.how_to_play_dashboard()
+        else:
+            self.draw_welcome_dashboard()
         self.continue_btn.draw_button()
         self.continue_btn.show_text()
 
