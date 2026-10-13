@@ -13,6 +13,7 @@ from menu_panel import MenuPanel
 from heart import Heart
 from form_field import FormField
 from data_manager import DataManager
+from sound_manager import SoundManager
 
 class GeniusArcade:
     '''
@@ -28,6 +29,7 @@ class GeniusArcade:
         self.initialize_window_properties()
         self.settings = Settings()
         self.data_manager = DataManager()
+        self.sound_manager = SoundManager()
         self.important_game_flags()
         self.stats = GameStats(self)
         self.create_panel_attribute()
@@ -618,10 +620,10 @@ class GeniusArcade:
             self.continue_btn.button()
             self.continue_btn.button_rect.bottomright = (self.screen_width - 30, self.screen_height - 30)
             self.continue_btn.rect.center = self.continue_btn.button_rect.center
-            # To confirm if the current user has an history.
+            # To confirm if the current user has an history to prepare the welcome screen ahead for the user.
             scores = [self.data_manager.get_high_score(self.active_user, mode) for mode in ("easy", "medium", "hard")]
             self.is_new_user = (sum(scores) == 0)
-            # If it matches, there is a game state chnage.
+            # If username matches username stored in database, there is a game state chnage.
             self.game_state = 'welcome'
             self.show_login_error = False
         else:
@@ -700,11 +702,14 @@ class GeniusArcade:
         for question in self.strd_qn:
             for answer in self.input_elements:
                 if answer.input == str(question.answer):
+                    self.sound_manager.play_correct()
                     self.ball_removal()
                     self.stats.score += 50
                     self.stats.update_high_score()
                     self.update_scores_data()
                     self.clear_qn_ans()
+                else:
+                    self.sound_manager.play_wrong()
 
     def update_scores_data(self):
         score_msg = f'Score: {self.stats.score}'
@@ -802,7 +807,6 @@ class GeniusArcade:
         '''Handles the update of the game elements'''
         for unique_ball in self.balls:
             unique_ball.update()
-        self.check_ball_collisions()
         self.update_spikes()
         self.update_bar()
 
@@ -839,26 +843,19 @@ class GeniusArcade:
             new_spike = Spike(self, -1)
             self.spikes.add(new_spike)
 
-    def check_ball_collisions(self):
-        '''Handles the collision between two balls in contact'''
-        collisions = pygame.sprite.groupcollide(self.balls, self.balls, False, False)
-        for ball, others in collisions.items():
-            for other in others:
-                if ball != other:
-                    ball.dx, other.dx = other.dx, ball.dx
-                    ball.dy, other.dy = other.dy, ball.dy
-
     def entities_collisions(self):
         '''Handles the collision between game entities'''
         for spike in self.spikes:
             for bar in self.bars:
                 if bar.rect.bottom >= spike.rect.top:
                     bar.kill()
+                    self.sound_manager.play_damage()
 
             for ball in self.balls:
                 if ball.rect.bottom >= spike.rect.top:
                     ball.kill()
                     self.update_ball_onscreen()
+                    self.sound_manager.play_pop()
 
         if not self.bars and not self.balls:
             self.stats.heart_num -= 1

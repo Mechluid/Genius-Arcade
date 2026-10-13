@@ -1,0 +1,15 @@
+# Byte-compiled / optimized Python files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment & IDE folders
+.vscode/
+.idea/
+venv/
+.venv/
+
+# OS specific files
+Thumbs.db
+Desktop.ini
+.DS_Store
