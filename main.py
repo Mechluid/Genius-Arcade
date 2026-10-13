@@ -550,6 +550,7 @@ class GeniusArcade:
         elif self.create_phase == 2:
             if self.create_to_login_btn.button_rect.collidepoint(mouse_pos):
                 self.game_state = 'login'
+                self.show_login_error = False
                 self.create_phase = 1
                 self.show_create_error = False
                 self.reg_username_field.clear_text()
