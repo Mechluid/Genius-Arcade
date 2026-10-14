@@ -13,3 +13,11 @@ venv/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Internal Developer Tooling & Media Generators
+capture_assets.py
+generate_video.py
+generate_bgm.py
+temp_frames/
+assets/demo_bgm.*
+*.tmp

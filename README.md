@@ -4,6 +4,26 @@
 
 ---
 
+<p align="center">
+  <img src="assets/gameplay_preview.gif" alt="Genius Arcade Active Gameplay Simulation" width="700">
+</p>
+
+<p align="center">
+  <b>🎬 <a href="assets/genius_arcade_demo.mp4">Watch Full 60-Second Video Walkthrough (with Audio)</a></b>
+</p>
+
+### 📸 Visual Proof of Work
+
+| 🔐 Modern Authentication & Veil Blur | 🎮 Active Kinematics & Equation Solver |
+| :---: | :---: |
+| <img src="assets/01_login.png" width="400" alt="Login UI"> | <img src="assets/07_gameplay_active.png" width="400" alt="Gameplay Active"> |
+
+| ⏸️ 10x Bilinear Blur Veil Pause | 🏆 Returning Player Records Dashboard |
+| :---: | :---: |
+| <img src="assets/08_pause_veil.png" width="400" alt="Pause Screen Veil"> | <img src="assets/05_welcome_back.png" width="400" alt="Welcome Back Dashboard"> |
+
+---
+
 ##  Purpose & The OOP Journey
 
 > *"I built Genius Arcade as an intensive, ground-up deep dive to master Object-Oriented Programming (OOP) in Python, state management and real-time software architecture and also to have an insight on how production grade softwares are written."*
