@@ -6,7 +6,7 @@ from ball import Ball
 from barrier import Barrier
 from spike import Spike
 from questions import Question
-from Input_block import InputBox
+from input_block import InputBox
 from menu_bar import MenuBar
 from game_stats import GameStats
 from menu_panel import MenuPanel

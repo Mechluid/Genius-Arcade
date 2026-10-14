@@ -10,10 +10,10 @@
 
 Rather than following a surface-level tutorial, this project was designed from scratch to put core computer science and OOP design patterns into practical, working software:
 
-* **Encapsulation & Single Responsibility:** Every domain in the game lives in its own dedicated, decoupled class. ranging from kinematic sprites (`Ball`, `Barrier`, `Spike`) to persistence (`DataManager`) and audio (`SoundManager`).
+* **Encapsulation & Single Responsibility:** Every domain in the game lives in its own dedicated, decoupled class ranging from kinematic sprites (`Ball`, `Barrier`, `Spike`) to persistence (`DataManager`) and audio (`SoundManager`).
 * **Inheritance & Polymorphism:** Extending Pygame's `Sprite` hierarchy to manage lifecycles, group collision matrices, and clean updates.
 * **Component-Based UI Architecture:** Building reusable GUI widgets (`MenuPanel`, `MenuBar`, `FormField`) with dynamic alignment, text rendering, and event handlers rather than hardcoded UI coordinates.
-* **The State Pattern (Finite State Machine):** Eliminating spaghetti flags by decomposing 9 distinct game screens (`login`, `create`, `reset`, `welcome`, `menu`, `playing`, `pause`, `game_over`) into isolated state drawers and event listeners.
+* **The State Pattern (Finite State Machine):** Eliminating spaghetti flags by decomposing 8 distinct game screens (`login`, `create`, `reset`, `welcome`, `menu`, `playing`, `pause`, `game_over`) into isolated state drawers and event listeners.
 * **Defensive Engineering & Persistence:** Architecting a 4-guard validation ladder and 3-phase password recovery system backed by clean JSON serialization.
 
 ---
@@ -25,7 +25,7 @@ Rather than following a surface-level tutorial, this project was designed from s
 To pop balls and survive, players must solve procedurally generated math puzzles under intense time pressure while managing player health, moving obstacles, and dynamic difficulty scaling.
 
 ### Core Mechanics
-* **Kinematics & Ball Trapping:** Balls are governed by gravitational acceleration ($a_y$), initial horizontal impulse ($a_x$), and elastic boundaries. A horizontally oscillating barrier traps and ricochets balls across the screen.
+- **Two-Stage Kinematics & Ball Trapping:** Balls enter via horizontal burst acceleration ($a_x$) before transitioning into gravitational freefall ($a_y$) upon hitting the boundary. Ricochets are governed by kinematic impulse velocities ($v_y = \sqrt{2 \cdot a_y \cdot h}$) and a horizontally oscillating barrier that traps balls in play.
 * **Procedural Hazard Chains:** Moving spikes cycle continuously across the bottom frame. If a ball or barrier strikes a spike, damage occurs.
 * **Heart & Damage System:** Players start with 3 hearts. Losing a ball or having the barrier strike a spike deducts health. Reaching 0 hearts triggers Game Over.
 * **Dynamic Math Engine:** Dynamically generates arithmetic equations at the bottom bar. Submitting correct answers pops trapped balls and awards points ($+50\text{ pts}$).
@@ -38,7 +38,7 @@ To pop balls and survive, players must solve procedurally generated math puzzles
 
 ## 🏛️ Project Architecture
 ```
-genius_arcade.py/
+Genius-Arcade/
 ├── main.py              # Central engine, state dispatcher, and game loop
 ├── settings.py          # Global constants, colors, timing, and physics scales
 ├── game_stats.py        # Score tracking and persistent record synchronizer
@@ -49,7 +49,7 @@ genius_arcade.py/
 ├── barrier.py           # Oscillating platform physics and boundary updates
 ├── spike.py             # Hazard sprite generation and procedural chaining
 ├── questions.py         # Arithmetic equation and answer generator
-├── Input_block.py       # Dynamic user input box and text renderer
+├── input_block.py       # Dynamic user input box and text renderer
 ├── form_field.py        # Reusable UI text input component with cursor logic
 ├── menu_panel.py        # Universal dialog card, button, and typography renderer
 ├── menu_bar.py          # Docked HUD elements and right-aligned buttons
@@ -89,9 +89,8 @@ genius_arcade.py/
 ### Setup Instructions
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/mechluid/genius_arcade.git
-   cd genius_arcade
-   ```
+   git clone [https://github.com/Mechluid/Genius-Arcade.git](https://github.com/Mechluid/Genius-Arcade.git)
+   cd Genius-Arcade
 
 2. **Install dependencies:**
    ```bash
