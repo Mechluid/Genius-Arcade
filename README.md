@@ -109,8 +109,9 @@ Genius-Arcade/
 ### Setup Instructions
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/Mechluid/Genius-Arcade.git](https://github.com/Mechluid/Genius-Arcade.git)
+   git clone https://github.com/Mechluid/Genius-Arcade.git
    cd Genius-Arcade
+   ```
 
 2. **Install dependencies:**
    ```bash
