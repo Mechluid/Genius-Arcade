@@ -45,15 +45,15 @@ Rather than following a surface-level tutorial, this project was designed from s
 To pop balls and survive, players must solve procedurally generated math puzzles under intense time pressure while managing player health, moving obstacles, and dynamic difficulty scaling.
 
 ### Core Mechanics
-- **Two-Stage Kinematics & Ball Trapping:** Balls enter via horizontal burst acceleration ($a_x$) before transitioning into gravitational freefall ($a_y$) upon hitting the boundary. Ricochets are governed by kinematic impulse velocities ($v_y = \sqrt{2 \cdot a_y \cdot h}$) and a horizontally oscillating barrier that traps balls in play.
-* **Procedural Hazard Chains:** Moving spikes cycle continuously across the bottom frame. If a ball or barrier strikes a spike, damage occurs.
-* **Heart & Damage System:** Players start with 3 hearts. Losing a ball or having the barrier strike a spike deducts health. Reaching 0 hearts triggers Game Over.
-* **Dynamic Math Engine:** Dynamically generates arithmetic equations at the bottom bar. Submitting correct answers pops trapped balls and awards points ($+50\text{ pts}$).
-* **Difficulty Scaling:**
-  * **Easy:** Low bar velocity, 3 balls.
-  * **Medium:** Faster barrier oscillation, increased ball density.
-  * **Hard:** High-speed barriers and dense ball counts requiring rapid cognitive response.
-
+* **Two-Stage Kinematics & Ball Trapping:** Balls enter via horizontal burst acceleration ($a_x$) before transitioning into gravitational freefall ($a_y$) upon hitting the boundary. Ricochets are governed by kinematic impulse velocities ($v_y = \sqrt{2 \cdot a_y \cdot h}$), and a full-width barrier traps the balls above it.
+* **The Descending Barrier:** The barrier slowly drops toward the spikes. Every question left unanswered speeds it up by 2%.
+* **Procedural Hazard Chains:** Moving spikes cycle continuously across the bottom of the screen. When the barrier reaches them, it breaks, and the trapped balls fall onto the spikes and pop.
+* **Heart & Damage System:** Players start with 3 hearts. Once the barrier and every ball are gone, a heart is lost and the round restarts. Reaching 0 hearts triggers Game Over.
+* **Dynamic Math Engine:** Procedurally generates arithmetic equations (+, −, ×, ÷) at the bottom of the screen. Each correct answer pops a trapped ball and awards +50 points.
+* **Rounds & Difficulty Scaling:** Every game starts with 5 balls; clearing them all starts the next round with more.
+  * **Easy:** Slowest barrier, +2 balls per round.
+  * **Medium:** Faster barrier, +4 balls per round.
+  * **Hard:** Fastest barrier, +6 balls per round.
 ---
 
 ## 🏛️ Project Architecture
@@ -62,7 +62,7 @@ Genius-Arcade/
 ├── main.py              # Central engine, state dispatcher, and game loop
 ├── settings.py          # Global constants, colors, timing, and physics scales
 ├── game_stats.py        # Score tracking and persistent record synchronizer
-├── data_manager.py      # Secure credential store and multi-tier high scores
+├── data_manager.py      # Local JSON credential store and multi-tier high scores
 ├── sound_manager.py     # Event-driven audio player and volume mixer
 ├── generate_sounds.py   # Procedural mathematical 16-bit PCM audio synthesizer
 ├── ball.py              # Sprite kinematics, impulses, and boundary snapping
@@ -70,7 +70,7 @@ Genius-Arcade/
 ├── spike.py             # Hazard sprite generation and procedural chaining
 ├── questions.py         # Arithmetic equation and answer generator
 ├── input_block.py       # Dynamic user input box and text renderer
-├── form_field.py        # Reusable UI text input component with cursor logic
+├── form_field.py        # Reusable UI text input component
 ├── menu_panel.py        # Universal dialog card, button, and typography renderer
 ├── menu_bar.py          # Docked HUD elements and right-aligned buttons
 ├── heart.py             # Player life-gauge sprite renderer
