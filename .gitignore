@@ -21,3 +21,4 @@ generate_bgm.py
 temp_frames/
 assets/demo_bgm.*
 *.tmp
+user_data.json
