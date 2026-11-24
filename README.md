@@ -3,14 +3,13 @@
 > **An educational arcade game combining kinematic projectile physics, reactive obstacle evasion, and rapid mental math agility.**
 
 ---
-
 <p align="center">
   <img src="assets/gameplay_preview.gif" alt="Genius Arcade Active Gameplay Simulation" width="700">
 </p>
 
-<p align="center">
-  <b>🎬 <a href="assets/genius_arcade_demo.mp4">Watch Full 60-Second Video Walkthrough (with Audio)</a></b>
-</p>
+**🎬 56-second walkthrough (sound on):**
+
+https://github.com/user-attachments/assets/304c4e38-7379-4717-b2a9-2418dfd14219
 
 ### 📸 Visual Proof of Work
 
@@ -82,7 +81,7 @@ Genius-Arcade/
 ### Key Technical Highlights
 1. **Freeze-Frame Veil (`screen_veil`):** Captures live display snapshots, downsamples by $10\times$, upscales via bilinear interpolation (`smoothscale`), and applies a $60\%$ dark alpha overlay (`(0, 0, 0, 160)`) to render modern blurred pause and dialog backdrops.
 2. **Adaptive Welcome Dashboard:** Evaluates user play history on login—presenting a **"HOW TO PLAY"** tutorial card for first-time players, and a 3-column personal records dashboard for returning players.
-3. **Procedural 16-Bit Audio Engine:** [`generate_sounds.py`](generate_sounds.py) programmatically synthesizes standard 16-bit PCM Mono `.wav` files using Python's built-in `wave`, `math`, and `struct` modules.
+3. **Procedural Audio:** The sound effects are synthesized in code rather than downloaded to avoid licensing issues for specific sounds. [`generate_sounds.py`](generate_sounds.py), written with AI assistance, builds 16-bit PCM `.wav` files using Python's built-in `wave`, `math` and `struct` modules.
 
 ---
 
